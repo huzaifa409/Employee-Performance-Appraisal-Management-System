@@ -141,7 +141,7 @@
           <Property Name="profileImagePath" Type="varchar" MaxLength="50" />
           <Property Name="isActive" Type="int" />
         </EntityType>
-        <Association Name="FK__CourseAll__cours__10566F31">
+        <Association Name="FK__CourseAll__cours__0F624AF8">
           <End Role="Course" Type="Self.Course" Multiplicity="0..1" />
           <End Role="CourseAllocation" Type="Self.CourseAllocation" Multiplicity="*" />
           <ReferentialConstraint>
@@ -153,7 +153,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__CourseAll__sessi__114A936A">
+        <Association Name="FK__CourseAll__sessi__10566F31">
           <End Role="Session" Type="Self.Session" Multiplicity="0..1" />
           <End Role="CourseAllocation" Type="Self.CourseAllocation" Multiplicity="*" />
           <ReferentialConstraint>
@@ -165,7 +165,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__CourseAll__teach__0F624AF8">
+        <Association Name="FK__CourseAll__teach__0E6E26BF">
           <End Role="Teacher" Type="Self.Teacher" Multiplicity="0..1" />
           <End Role="CourseAllocation" Type="Self.CourseAllocation" Multiplicity="*" />
           <ReferentialConstraint>
@@ -177,7 +177,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__EmployeSe__KPIID__66603565">
+        <Association Name="FK__EmployeSe__KPIID__656C112C">
           <End Role="KPI" Type="Self.KPI" Multiplicity="0..1" />
           <End Role="EmployeSessionKPI" Type="Self.EmployeSessionKPI" Multiplicity="*" />
           <ReferentialConstraint>
@@ -189,7 +189,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__EmployeSe__Sessi__68487DD7">
+        <Association Name="FK__EmployeSe__Sessi__6754599E">
           <End Role="Session" Type="Self.Session" Multiplicity="0..1" />
           <End Role="EmployeSessionKPI" Type="Self.EmployeSessionKPI" Multiplicity="*" />
           <ReferentialConstraint>
@@ -201,7 +201,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__EmployeSe__SubKP__6754599E">
+        <Association Name="FK__EmployeSe__SubKP__66603565">
           <End Role="SubKPI" Type="Self.SubKPI" Multiplicity="0..1" />
           <End Role="EmployeSessionKPI" Type="Self.EmployeSessionKPI" Multiplicity="*" />
           <ReferentialConstraint>
@@ -213,7 +213,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__Enrollmen__cours__7C4F7684">
+        <Association Name="FK__Enrollmen__cours__7B5B524B">
           <End Role="Course" Type="Self.Course" Multiplicity="0..1" />
           <End Role="Enrollment" Type="Self.Enrollment" Multiplicity="*" />
           <ReferentialConstraint>
@@ -225,7 +225,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__Enrollmen__sessi__7D439ABD">
+        <Association Name="FK__Enrollmen__sessi__7C4F7684">
           <End Role="Session" Type="Self.Session" Multiplicity="0..1" />
           <End Role="Enrollment" Type="Self.Enrollment" Multiplicity="*" />
           <ReferentialConstraint>
@@ -237,7 +237,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__Enrollmen__stude__7A672E12">
+        <Association Name="FK__Enrollmen__stude__797309D9">
           <End Role="Student" Type="Self.Student" Multiplicity="0..1" />
           <End Role="Enrollment" Type="Self.Enrollment" Multiplicity="*" />
           <ReferentialConstraint>
@@ -249,7 +249,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__Enrollmen__teach__7B5B524B">
+        <Association Name="FK__Enrollmen__teach__7A672E12">
           <End Role="Teacher" Type="Self.Teacher" Multiplicity="0..1" />
           <End Role="Enrollment" Type="Self.Enrollment" Multiplicity="*" />
           <ReferentialConstraint>
@@ -261,7 +261,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__KPIScore__empID__6E01572D">
+        <Association Name="FK__KPIScore__empID__6D0D32F4">
           <End Role="Users" Type="Self.Users" Multiplicity="0..1" />
           <End Role="KPIScore" Type="Self.KPIScore" Multiplicity="*" />
           <ReferentialConstraint>
@@ -273,7 +273,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__KPIScore__empKPI__6D0D32F4">
+        <Association Name="FK__KPIScore__empKPI__6C190EBB">
           <End Role="EmployeSessionKPI" Type="Self.EmployeSessionKPI" Multiplicity="0..1" />
           <End Role="KPIScore" Type="Self.KPIScore" Multiplicity="*" />
           <ReferentialConstraint>
@@ -285,7 +285,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__KPIScore__evalua__6EF57B66">
+        <Association Name="FK__KPIScore__evalua__6E01572D">
           <End Role="Users" Type="Self.Users" Multiplicity="0..1" />
           <End Role="KPIScore" Type="Self.KPIScore" Multiplicity="*" />
           <ReferentialConstraint>
@@ -297,7 +297,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__PeerEvalu__cours__0C85DE4D">
+        <Association Name="FK__PeerEvalu__cours__0B91BA14">
           <End Role="Course" Type="Self.Course" Multiplicity="0..1" />
           <End Role="PeerEvaluation" Type="Self.PeerEvaluation" Multiplicity="*" />
           <ReferentialConstraint>
@@ -309,7 +309,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__PeerEvalu__evalu__09A971A2">
+        <Association Name="FK__PeerEvalu__evalu__08B54D69">
           <End Role="PeerEvaluator" Type="Self.PeerEvaluator" Multiplicity="0..1" />
           <End Role="PeerEvaluation" Type="Self.PeerEvaluation" Multiplicity="*" />
           <ReferentialConstraint>
@@ -321,7 +321,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__PeerEvalu__evalu__0A9D95DB">
+        <Association Name="FK__PeerEvalu__evalu__09A971A2">
           <End Role="Teacher" Type="Self.Teacher" Multiplicity="0..1" />
           <End Role="PeerEvaluation" Type="Self.PeerEvaluation" Multiplicity="*" />
           <ReferentialConstraint>
@@ -333,7 +333,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__PeerEvalu__quest__0B91BA14">
+        <Association Name="FK__PeerEvalu__quest__0A9D95DB">
           <End Role="Questionare" Type="Self.Questionare" Multiplicity="0..1" />
           <End Role="PeerEvaluation" Type="Self.PeerEvaluation" Multiplicity="*" />
           <ReferentialConstraint>
@@ -345,7 +345,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__PeerEvalu__sessi__06CD04F7">
+        <Association Name="FK__PeerEvalu__sessi__05D8E0BE">
           <End Role="Session" Type="Self.Session" Multiplicity="0..1" />
           <End Role="PeerEvaluator" Type="Self.PeerEvaluator" Multiplicity="*" />
           <ReferentialConstraint>
@@ -357,7 +357,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__PeerEvalu__teach__05D8E0BE">
+        <Association Name="FK__PeerEvalu__teach__04E4BC85">
           <End Role="Teacher" Type="Self.Teacher" Multiplicity="0..1" />
           <End Role="PeerEvaluator" Type="Self.PeerEvaluator" Multiplicity="*" />
           <ReferentialConstraint>
@@ -369,7 +369,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__Student__admissi__72C60C4A">
+        <Association Name="FK__Student__admissi__71D1E811">
           <End Role="Session" Type="Self.Session" Multiplicity="0..1" />
           <End Role="Student" Type="Self.Student" Multiplicity="*" />
           <ReferentialConstraint>
@@ -381,7 +381,19 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__StudentEv__enrol__02084FDA">
+        <Association Name="FK__Student__userID__70DDC3D8">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="Student" Type="Self.Student" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Student">
+              <PropertyRef Name="userID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__StudentEv__enrol__01142BA1">
           <End Role="Enrollment" Type="Self.Enrollment" Multiplicity="0..1" />
           <End Role="StudentEvaluation" Type="Self.StudentEvaluation" Multiplicity="*" />
           <ReferentialConstraint>
@@ -393,7 +405,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__StudentEv__quest__02FC7413">
+        <Association Name="FK__StudentEv__quest__02084FDA">
           <End Role="Questionare" Type="Self.Questionare" Multiplicity="0..1" />
           <End Role="StudentEvaluation" Type="Self.StudentEvaluation" Multiplicity="*" />
           <ReferentialConstraint>
@@ -405,7 +417,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__SubKPI__KPIID__6383C8BA">
+        <Association Name="FK__SubKPI__KPIID__628FA481">
           <End Role="KPI" Type="Self.KPI" Multiplicity="0..1" />
           <End Role="SubKPI" Type="Self.SubKPI" Multiplicity="*" />
           <ReferentialConstraint>
@@ -417,7 +429,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__Teacher__userID__75A278F5">
+        <Association Name="FK__Teacher__userID__74AE54BC">
           <End Role="Users" Type="Self.Users" Multiplicity="1" />
           <End Role="Teacher" Type="Self.Teacher" Multiplicity="0..1" />
           <ReferentialConstraint>
@@ -446,99 +458,103 @@
           <EntitySet Name="SubKPI" EntityType="Self.SubKPI" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Teacher" EntityType="Self.Teacher" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Users" EntityType="Self.Users" Schema="dbo" store:Type="Tables" />
-          <AssociationSet Name="FK__CourseAll__cours__10566F31" Association="Self.FK__CourseAll__cours__10566F31">
+          <AssociationSet Name="FK__CourseAll__cours__0F624AF8" Association="Self.FK__CourseAll__cours__0F624AF8">
             <End Role="Course" EntitySet="Course" />
             <End Role="CourseAllocation" EntitySet="CourseAllocation" />
           </AssociationSet>
-          <AssociationSet Name="FK__CourseAll__sessi__114A936A" Association="Self.FK__CourseAll__sessi__114A936A">
+          <AssociationSet Name="FK__CourseAll__sessi__10566F31" Association="Self.FK__CourseAll__sessi__10566F31">
             <End Role="Session" EntitySet="Session" />
             <End Role="CourseAllocation" EntitySet="CourseAllocation" />
           </AssociationSet>
-          <AssociationSet Name="FK__CourseAll__teach__0F624AF8" Association="Self.FK__CourseAll__teach__0F624AF8">
+          <AssociationSet Name="FK__CourseAll__teach__0E6E26BF" Association="Self.FK__CourseAll__teach__0E6E26BF">
             <End Role="Teacher" EntitySet="Teacher" />
             <End Role="CourseAllocation" EntitySet="CourseAllocation" />
           </AssociationSet>
-          <AssociationSet Name="FK__EmployeSe__KPIID__66603565" Association="Self.FK__EmployeSe__KPIID__66603565">
+          <AssociationSet Name="FK__EmployeSe__KPIID__656C112C" Association="Self.FK__EmployeSe__KPIID__656C112C">
             <End Role="KPI" EntitySet="KPI" />
             <End Role="EmployeSessionKPI" EntitySet="EmployeSessionKPI" />
           </AssociationSet>
-          <AssociationSet Name="FK__EmployeSe__Sessi__68487DD7" Association="Self.FK__EmployeSe__Sessi__68487DD7">
+          <AssociationSet Name="FK__EmployeSe__Sessi__6754599E" Association="Self.FK__EmployeSe__Sessi__6754599E">
             <End Role="Session" EntitySet="Session" />
             <End Role="EmployeSessionKPI" EntitySet="EmployeSessionKPI" />
           </AssociationSet>
-          <AssociationSet Name="FK__EmployeSe__SubKP__6754599E" Association="Self.FK__EmployeSe__SubKP__6754599E">
+          <AssociationSet Name="FK__EmployeSe__SubKP__66603565" Association="Self.FK__EmployeSe__SubKP__66603565">
             <End Role="SubKPI" EntitySet="SubKPI" />
             <End Role="EmployeSessionKPI" EntitySet="EmployeSessionKPI" />
           </AssociationSet>
-          <AssociationSet Name="FK__Enrollmen__cours__7C4F7684" Association="Self.FK__Enrollmen__cours__7C4F7684">
+          <AssociationSet Name="FK__Enrollmen__cours__7B5B524B" Association="Self.FK__Enrollmen__cours__7B5B524B">
             <End Role="Course" EntitySet="Course" />
             <End Role="Enrollment" EntitySet="Enrollment" />
           </AssociationSet>
-          <AssociationSet Name="FK__Enrollmen__sessi__7D439ABD" Association="Self.FK__Enrollmen__sessi__7D439ABD">
+          <AssociationSet Name="FK__Enrollmen__sessi__7C4F7684" Association="Self.FK__Enrollmen__sessi__7C4F7684">
             <End Role="Session" EntitySet="Session" />
             <End Role="Enrollment" EntitySet="Enrollment" />
           </AssociationSet>
-          <AssociationSet Name="FK__Enrollmen__stude__7A672E12" Association="Self.FK__Enrollmen__stude__7A672E12">
+          <AssociationSet Name="FK__Enrollmen__stude__797309D9" Association="Self.FK__Enrollmen__stude__797309D9">
             <End Role="Student" EntitySet="Student" />
             <End Role="Enrollment" EntitySet="Enrollment" />
           </AssociationSet>
-          <AssociationSet Name="FK__Enrollmen__teach__7B5B524B" Association="Self.FK__Enrollmen__teach__7B5B524B">
+          <AssociationSet Name="FK__Enrollmen__teach__7A672E12" Association="Self.FK__Enrollmen__teach__7A672E12">
             <End Role="Teacher" EntitySet="Teacher" />
             <End Role="Enrollment" EntitySet="Enrollment" />
           </AssociationSet>
-          <AssociationSet Name="FK__KPIScore__empID__6E01572D" Association="Self.FK__KPIScore__empID__6E01572D">
+          <AssociationSet Name="FK__KPIScore__empID__6D0D32F4" Association="Self.FK__KPIScore__empID__6D0D32F4">
             <End Role="Users" EntitySet="Users" />
             <End Role="KPIScore" EntitySet="KPIScore" />
           </AssociationSet>
-          <AssociationSet Name="FK__KPIScore__empKPI__6D0D32F4" Association="Self.FK__KPIScore__empKPI__6D0D32F4">
+          <AssociationSet Name="FK__KPIScore__empKPI__6C190EBB" Association="Self.FK__KPIScore__empKPI__6C190EBB">
             <End Role="EmployeSessionKPI" EntitySet="EmployeSessionKPI" />
             <End Role="KPIScore" EntitySet="KPIScore" />
           </AssociationSet>
-          <AssociationSet Name="FK__KPIScore__evalua__6EF57B66" Association="Self.FK__KPIScore__evalua__6EF57B66">
+          <AssociationSet Name="FK__KPIScore__evalua__6E01572D" Association="Self.FK__KPIScore__evalua__6E01572D">
             <End Role="Users" EntitySet="Users" />
             <End Role="KPIScore" EntitySet="KPIScore" />
           </AssociationSet>
-          <AssociationSet Name="FK__PeerEvalu__cours__0C85DE4D" Association="Self.FK__PeerEvalu__cours__0C85DE4D">
+          <AssociationSet Name="FK__PeerEvalu__cours__0B91BA14" Association="Self.FK__PeerEvalu__cours__0B91BA14">
             <End Role="Course" EntitySet="Course" />
+            <End Role="PeerEvaluation" EntitySet="PeerEvaluation" />
+          </AssociationSet>
+          <AssociationSet Name="FK__PeerEvalu__evalu__08B54D69" Association="Self.FK__PeerEvalu__evalu__08B54D69">
+            <End Role="PeerEvaluator" EntitySet="PeerEvaluator" />
             <End Role="PeerEvaluation" EntitySet="PeerEvaluation" />
           </AssociationSet>
           <AssociationSet Name="FK__PeerEvalu__evalu__09A971A2" Association="Self.FK__PeerEvalu__evalu__09A971A2">
-            <End Role="PeerEvaluator" EntitySet="PeerEvaluator" />
-            <End Role="PeerEvaluation" EntitySet="PeerEvaluation" />
-          </AssociationSet>
-          <AssociationSet Name="FK__PeerEvalu__evalu__0A9D95DB" Association="Self.FK__PeerEvalu__evalu__0A9D95DB">
             <End Role="Teacher" EntitySet="Teacher" />
             <End Role="PeerEvaluation" EntitySet="PeerEvaluation" />
           </AssociationSet>
-          <AssociationSet Name="FK__PeerEvalu__quest__0B91BA14" Association="Self.FK__PeerEvalu__quest__0B91BA14">
+          <AssociationSet Name="FK__PeerEvalu__quest__0A9D95DB" Association="Self.FK__PeerEvalu__quest__0A9D95DB">
             <End Role="Questionare" EntitySet="Questionare" />
             <End Role="PeerEvaluation" EntitySet="PeerEvaluation" />
           </AssociationSet>
-          <AssociationSet Name="FK__PeerEvalu__sessi__06CD04F7" Association="Self.FK__PeerEvalu__sessi__06CD04F7">
+          <AssociationSet Name="FK__PeerEvalu__sessi__05D8E0BE" Association="Self.FK__PeerEvalu__sessi__05D8E0BE">
             <End Role="Session" EntitySet="Session" />
             <End Role="PeerEvaluator" EntitySet="PeerEvaluator" />
           </AssociationSet>
-          <AssociationSet Name="FK__PeerEvalu__teach__05D8E0BE" Association="Self.FK__PeerEvalu__teach__05D8E0BE">
+          <AssociationSet Name="FK__PeerEvalu__teach__04E4BC85" Association="Self.FK__PeerEvalu__teach__04E4BC85">
             <End Role="Teacher" EntitySet="Teacher" />
             <End Role="PeerEvaluator" EntitySet="PeerEvaluator" />
           </AssociationSet>
-          <AssociationSet Name="FK__Student__admissi__72C60C4A" Association="Self.FK__Student__admissi__72C60C4A">
+          <AssociationSet Name="FK__Student__admissi__71D1E811" Association="Self.FK__Student__admissi__71D1E811">
             <End Role="Session" EntitySet="Session" />
             <End Role="Student" EntitySet="Student" />
           </AssociationSet>
-          <AssociationSet Name="FK__StudentEv__enrol__02084FDA" Association="Self.FK__StudentEv__enrol__02084FDA">
+          <AssociationSet Name="FK__Student__userID__70DDC3D8" Association="Self.FK__Student__userID__70DDC3D8">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Student" EntitySet="Student" />
+          </AssociationSet>
+          <AssociationSet Name="FK__StudentEv__enrol__01142BA1" Association="Self.FK__StudentEv__enrol__01142BA1">
             <End Role="Enrollment" EntitySet="Enrollment" />
             <End Role="StudentEvaluation" EntitySet="StudentEvaluation" />
           </AssociationSet>
-          <AssociationSet Name="FK__StudentEv__quest__02FC7413" Association="Self.FK__StudentEv__quest__02FC7413">
+          <AssociationSet Name="FK__StudentEv__quest__02084FDA" Association="Self.FK__StudentEv__quest__02084FDA">
             <End Role="Questionare" EntitySet="Questionare" />
             <End Role="StudentEvaluation" EntitySet="StudentEvaluation" />
           </AssociationSet>
-          <AssociationSet Name="FK__SubKPI__KPIID__6383C8BA" Association="Self.FK__SubKPI__KPIID__6383C8BA">
+          <AssociationSet Name="FK__SubKPI__KPIID__628FA481" Association="Self.FK__SubKPI__KPIID__628FA481">
             <End Role="KPI" EntitySet="KPI" />
             <End Role="SubKPI" EntitySet="SubKPI" />
           </AssociationSet>
-          <AssociationSet Name="FK__Teacher__userID__75A278F5" Association="Self.FK__Teacher__userID__75A278F5">
+          <AssociationSet Name="FK__Teacher__userID__74AE54BC" Association="Self.FK__Teacher__userID__74AE54BC">
             <End Role="Users" EntitySet="Users" />
             <End Role="Teacher" EntitySet="Teacher" />
           </AssociationSet>

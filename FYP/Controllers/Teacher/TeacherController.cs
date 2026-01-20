@@ -4,7 +4,8 @@ using System;
 using System.Data;
 using System.Web;
 using System.Web.Http;
-using FYP.Models;
+using TeacherModel = FYP.Models.Teacher;
+
 
 namespace FYP.Controllers.Teacher
 {
@@ -49,12 +50,29 @@ namespace FYP.Controllers.Teacher
 
                         foreach (DataRow row in dataTable.Rows)
                         {
-                            // Hardcoded UserID for all teachers
-                            //string hardcodedUserId = "3"; // replace with actual UserID from Users table
+                            string userId = row["Userid"].ToString();
 
-                            FYP.Models.Teacher teacher = new FYP.Models.Teacher
+                            // 1️⃣ Check if the user already exists
+                            var existingUser = db.Users.Find(userId);
+
+                            if (existingUser == null)
                             {
-                                userID = row["Userid"].ToString(), // foreign key
+                                // 2️⃣ User doesn't exist, add to Users first
+                                Users newUser = new Users
+                                {
+                                    id = userId,
+                                    password = "default123",       // You can customize this
+                                    role = "Teacher",
+                                    profileImagePath = null,
+                                    isActive = 1
+                                };
+                                db.Users.Add(newUser);
+                            }
+
+                            // 3️⃣ Add to Teacher table
+                            TeacherModel teacher = new TeacherModel()
+                            {
+                                userID = userId,
                                 name = row["Name"].ToString(),
                                 department = row["Department"].ToString()
                             };
@@ -62,6 +80,7 @@ namespace FYP.Controllers.Teacher
                             db.Teacher.Add(teacher);
                         }
 
+                        // Save all changes (Users + Teacher) in one transaction
                         db.SaveChanges();
                     }
                 }
@@ -72,10 +91,7 @@ namespace FYP.Controllers.Teacher
             {
                 return BadRequest(ex.Message);
             }
-
         }
-
-
 
         [HttpGet]
         [Route("ping")]
@@ -83,6 +99,5 @@ namespace FYP.Controllers.Teacher
         {
             return Ok("API is alive");
         }
-
     }
 }

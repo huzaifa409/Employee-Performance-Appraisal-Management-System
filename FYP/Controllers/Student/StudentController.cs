@@ -7,8 +7,9 @@ using System.Web.Http;
 
 namespace FYP.Controllers
 {
-    
 
+
+    // STUDENT API
     // STUDENT API
     [RoutePrefix("api/student")]
     public class StudentController : ApiController
@@ -61,13 +62,6 @@ namespace FYP.Controllers
                         if (!int.TryParse(row["AdmissionSessionId"].ToString(), out sessionId))
                             continue;
 
-                        // Check if student already exists
-                        if (db.Student.Find(userId) != null)
-                        {
-                            skippedDuplicate++;
-                            continue;
-                        }
-
                         // Check if session exists
                         if (db.Session.Find(sessionId) == null)
                         {
@@ -75,7 +69,31 @@ namespace FYP.Controllers
                             continue;
                         }
 
-                        // Add student
+                        // 1️⃣ Check if user exists in Users table
+                        var existingUser = db.Users.Find(userId);
+
+                        if (existingUser == null)
+                        {
+                            // 2️⃣ User doesn't exist, add to Users first
+                            Users newUser = new Users
+                            {
+                                id = userId,
+                                password = "default123",       // Can be customized
+                                role = "Student",
+                                profileImagePath = null,
+                                isActive = 1
+                            };
+                            db.Users.Add(newUser);
+                        }
+
+                        // 3️⃣ Check if student already exists in Student table
+                        if (db.Student.Find(userId) != null)
+                        {
+                            skippedDuplicate++;
+                            continue;
+                        }
+
+                        // 4️⃣ Add to Student table
                         db.Student.Add(new FYP.Models.Student
                         {
                             userID = userId,
@@ -86,6 +104,7 @@ namespace FYP.Controllers
                         insertedCount++;
                     }
 
+                    // Save all changes in one transaction (Users + Student)
                     db.SaveChanges();
 
                     string message = $"{insertedCount} students uploaded successfully.";
@@ -101,9 +120,10 @@ namespace FYP.Controllers
             }
         }
 
-
         [HttpGet]
         [Route("ping")]
         public IHttpActionResult PingStudent() => Ok("Student API is alive");
     }
+
+
 }
