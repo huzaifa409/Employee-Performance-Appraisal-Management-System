@@ -9,8 +9,7 @@ namespace FYP.Controllers
 {
 
 
-    // STUDENT API
-    // STUDENT API
+    
     [RoutePrefix("api/student")]
     public class StudentController : ApiController
     {
@@ -31,7 +30,7 @@ namespace FYP.Controllers
                 if (file == null || file.ContentLength == 0)
                     return BadRequest("Empty file.");
 
-                // Needed for ExcelDataReader
+               
                 System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
 
                 using (var stream = file.InputStream)
@@ -50,7 +49,7 @@ namespace FYP.Controllers
 
                     foreach (DataRow row in dataTable.Rows)
                     {
-                        // Validate required columns
+                        
                         if (row["UserID"] == DBNull.Value || row["Name"] == DBNull.Value || row["AdmissionSessionId"] == DBNull.Value)
                             continue;
 
