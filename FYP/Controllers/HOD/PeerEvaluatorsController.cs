@@ -15,8 +15,6 @@ namespace FYP.Controllers.HOD
         FYPEntities db = new FYPEntities();
 
         
-       
-            
             [HttpGet]
             [Route("Teachers")]
             public IHttpActionResult GetTeachers()
@@ -82,7 +80,6 @@ namespace FYP.Controllers.HOD
             return Ok("Peer evaluators added successfully");
         }
 
-       
         [HttpGet]
         [Route("BySession/{sessionId}")]
         public IHttpActionResult GetPeerEvaluatorsBySession(int sessionId)
@@ -92,16 +89,14 @@ namespace FYP.Controllers.HOD
                               where pe.sessionID == sessionId
                               select new
                               {
-                                  t.userID,
-                                  t.name,
-                                  t.department
+                                  userID = t.userID,  
+                                  name = t.name,
+                                  department = t.department
                               }).ToList();
 
-
-            if (evaluators.Count == 0) return BadRequest("No Teacher Found ");
-
-            return Ok(evaluators);
+            return Ok(evaluators); 
         }
+
 
 
 

@@ -127,9 +127,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\DATACELL\Enrollment\EnrollmentController.cs" />
     <Compile Include="Controllers\DATACELL\Student\CourseController.cs" />
     <Compile Include="Controllers\DATACELL\Student\StudentController.cs" />
     <Compile Include="Controllers\DATACELL\Teacher\TeacherController.cs" />
+    <Compile Include="Controllers\HOD\KPIController.cs" />
     <Compile Include="Controllers\HOD\PeerEvaluatorsController.cs" />
     <Compile Include="Controllers\LOGIN\UsersController.cs" />
     <Compile Include="Global.asax.cs">

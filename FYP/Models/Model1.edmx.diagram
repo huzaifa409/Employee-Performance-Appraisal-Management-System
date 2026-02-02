@@ -5,22 +5,22 @@
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
       <Diagram DiagramId="890f25c7f0cd4bce9957adb642de3b1f" Name="Diagram1">
-        <EntityTypeShape EntityType="FYPModel.Course" Width="1.5" PointX="6" PointY="6.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="FYPModel.Course" Width="1.5" PointX="4.875" PointY="3.375" IsExpanded="true" />
         <EntityTypeShape EntityType="FYPModel.CourseAllocation" Width="1.5" PointX="5.25" PointY="16.25" IsExpanded="true" />
-        <EntityTypeShape EntityType="FYPModel.EmployeeType" Width="1.5" PointX="2.75" PointY="3.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="FYPModel.EmployeeType" Width="1.5" PointX="4.25" PointY="1" IsExpanded="true" />
         <EntityTypeShape EntityType="FYPModel.EmployeSessionKPI" Width="1.5" PointX="0.75" PointY="3.875" IsExpanded="true" />
-        <EntityTypeShape EntityType="FYPModel.Enrollment" Width="1.5" PointX="8.25" PointY="12" IsExpanded="true" />
+        <EntityTypeShape EntityType="FYPModel.Enrollment" Width="1.5" PointX="6.125" PointY="6.375" IsExpanded="true" />
         <EntityTypeShape EntityType="FYPModel.KPI" Width="1.5" PointX="1.5" PointY="0.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="FYPModel.KPIScore" Width="1.5" PointX="3" PointY="9.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="FYPModel.KPIScore" Width="1.5" PointX="3.625" PointY="6.5" IsExpanded="true" />
         <EntityTypeShape EntityType="FYPModel.PeerEvaluation" Width="1.5" PointX="8.25" PointY="16" IsExpanded="true" />
         <EntityTypeShape EntityType="FYPModel.PeerEvaluator" Width="1.5" PointX="5.25" PointY="13.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="FYPModel.Questionare" Width="1.5" PointX="8.25" PointY="8.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="FYPModel.Questionare" Width="1.5" PointX="9.5" PointY="3" IsExpanded="true" />
         <EntityTypeShape EntityType="FYPModel.Session" Width="1.5" PointX="1.5" PointY="21.25" IsExpanded="true" />
-        <EntityTypeShape EntityType="FYPModel.Student" Width="1.5" PointX="6" PointY="10.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="FYPModel.StudentEvaluation" Width="1.5" PointX="10.5" PointY="12.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="FYPModel.Student" Width="1.5" PointX="7.375" PointY="3.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="FYPModel.StudentEvaluation" Width="1.5" PointX="9.375" PointY="5.875" IsExpanded="true" />
         <EntityTypeShape EntityType="FYPModel.SubKPI" Width="1.5" PointX="1.5" PointY="13.375" IsExpanded="true" />
         <EntityTypeShape EntityType="FYPModel.Teacher" Width="1.5" PointX="3" PointY="16.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="FYPModel.Users" Width="1.5" PointX="0.75" PointY="9.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="FYPModel.Users" Width="1.5" PointX="1.125" PointY="7.125" IsExpanded="true" />
         <AssociationConnector Association="FYPModel.FK__CourseAll__cours__10566F31" ManuallyRouted="false" />
         <AssociationConnector Association="FYPModel.FK__Enrollmen__cours__7C4F7684" ManuallyRouted="false" />
         <AssociationConnector Association="FYPModel.FK__PeerEvalu__cours__0C85DE4D" ManuallyRouted="false" />

@@ -2,6 +2,9 @@
 using FYP.Models;
 using System;
 using System.Data;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Web;
 using System.Web.Http;
 using TeacherModel = FYP.Models.Teacher;
@@ -91,6 +94,21 @@ namespace FYP.Controllers.Teacher
             {
                 return BadRequest(ex.Message);
             }
+        }
+
+        [HttpGet]
+        [Route("GetTeachers")]
+        public HttpResponseMessage GetTeachers()
+        {
+                var res=db.Teacher.ToList();
+
+            if(res.Count == 0)
+            {
+                return Request.CreateResponse(HttpStatusCode.NotFound, "No Teacher Found");
+            }
+
+            return Request.CreateResponse(HttpStatusCode.OK, res);
+
         }
 
         [HttpGet]

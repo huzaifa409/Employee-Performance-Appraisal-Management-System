@@ -53,6 +53,7 @@
           </Key>
           <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="name" Type="varchar" MaxLength="50" />
+          <Property Name="weight" Type="varchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="KPIScore">
           <Key>
@@ -122,6 +123,7 @@
           <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="KPIID" Type="int" />
           <Property Name="name" Type="varchar" MaxLength="50" />
+          <Property Name="weight" Type="varchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="Teacher">
           <Key>
@@ -628,6 +630,7 @@
           <Property Name="name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="EmployeSessionKPI" Relationship="Self.FK__EmployeSe__KPIID__66603565" FromRole="KPI" ToRole="EmployeSessionKPI" />
           <NavigationProperty Name="SubKPI" Relationship="Self.FK__SubKPI__KPIID__6383C8BA" FromRole="KPI" ToRole="SubKPI" />
+          <Property Name="weight" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="KPIScore">
           <Key>
@@ -721,6 +724,7 @@
           <Property Name="name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="EmployeSessionKPI" Relationship="Self.FK__EmployeSe__SubKP__6754599E" FromRole="SubKPI" ToRole="EmployeSessionKPI" />
           <NavigationProperty Name="KPI" Relationship="Self.FK__SubKPI__KPIID__6383C8BA" FromRole="SubKPI" ToRole="KPI" />
+          <Property Name="weight" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="Teacher">
           <Key>
@@ -1223,6 +1227,7 @@
           <EntitySetMapping Name="KPI">
             <EntityTypeMapping TypeName="FYPModel.KPI">
               <MappingFragment StoreEntitySet="KPI">
+                <ScalarProperty Name="weight" ColumnName="weight" />
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="name" ColumnName="name" />
               </MappingFragment>
@@ -1299,6 +1304,7 @@
           <EntitySetMapping Name="SubKPI">
             <EntityTypeMapping TypeName="FYPModel.SubKPI">
               <MappingFragment StoreEntitySet="SubKPI">
+                <ScalarProperty Name="weight" ColumnName="weight" />
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="KPIID" ColumnName="KPIID" />
                 <ScalarProperty Name="name" ColumnName="name" />
