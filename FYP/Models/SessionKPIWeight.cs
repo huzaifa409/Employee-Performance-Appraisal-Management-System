@@ -12,18 +12,16 @@ namespace FYP.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class EmployeeType
+    public partial class SessionKPIWeight
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public EmployeeType()
-        {
-            this.KPI = new HashSet<KPI>();
-        }
-    
         public int id { get; set; }
-        public string type { get; set; }
+        public Nullable<int> SessionID { get; set; }
+        public Nullable<int> KPIID { get; set; }
+        public Nullable<int> SubKPIID { get; set; }
+        public Nullable<int> Weight { get; set; }
     
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<KPI> KPI { get; set; }
+        public virtual KPI KPI { get; set; }
+        public virtual Session Session { get; set; }
+        public virtual SubKPI SubKPI { get; set; }
     }
 }

@@ -22,6 +22,7 @@ namespace FYP.Models
             this.Enrollment = new HashSet<Enrollment>();
             this.PeerEvaluator = new HashSet<PeerEvaluator>();
             this.Student = new HashSet<Student>();
+            this.SessionKPIWeight = new HashSet<SessionKPIWeight>();
         }
     
         public int id { get; set; }
@@ -37,5 +38,7 @@ namespace FYP.Models
         public virtual ICollection<PeerEvaluator> PeerEvaluator { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Student> Student { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<SessionKPIWeight> SessionKPIWeight { get; set; }
     }
 }

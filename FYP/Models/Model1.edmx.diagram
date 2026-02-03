@@ -46,6 +46,11 @@
         <AssociationConnector Association="FYPModel.FK__Student__admissi__72C60C4A" ManuallyRouted="false" />
         <AssociationConnector Association="FYPModel.FK__Student__userID__71D1E811" ManuallyRouted="false" />
         <AssociationConnector Association="FYPModel.FK__Teacher__userID__75A278F5" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="FYPModel.SessionKPIWeight" Width="1.5" PointX="3.75" PointY="10" />
+        <AssociationConnector Association="FYPModel.FK__KPI__KPI_Employe__14270015" />
+        <AssociationConnector Association="FYPModel.FK__SessionKP__KPIID__17F790F9" />
+        <AssociationConnector Association="FYPModel.FK__SessionKP__Sessi__17036CC0" />
+        <AssociationConnector Association="FYPModel.FK__SessionKP__SubKP__18EBB532" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

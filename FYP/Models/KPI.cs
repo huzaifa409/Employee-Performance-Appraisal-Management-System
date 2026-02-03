@@ -19,15 +19,19 @@ namespace FYP.Models
         {
             this.EmployeSessionKPI = new HashSet<EmployeSessionKPI>();
             this.SubKPI = new HashSet<SubKPI>();
+            this.SessionKPIWeight = new HashSet<SessionKPIWeight>();
         }
     
         public int id { get; set; }
         public string name { get; set; }
-        public string weight { get; set; }
+        public Nullable<int> KPI_Employeetype { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<EmployeSessionKPI> EmployeSessionKPI { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<SubKPI> SubKPI { get; set; }
+        public virtual EmployeeType EmployeeType { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<SessionKPIWeight> SessionKPIWeight { get; set; }
     }
 }

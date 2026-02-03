@@ -41,5 +41,6 @@ namespace FYP.Models
         public virtual DbSet<SubKPI> SubKPI { get; set; }
         public virtual DbSet<Teacher> Teacher { get; set; }
         public virtual DbSet<Users> Users { get; set; }
+        public virtual DbSet<SessionKPIWeight> SessionKPIWeight { get; set; }
     }
 }
