@@ -40,81 +40,108 @@ namespace FYP.Controllers.HOD
             if (dto == null || dto.SubKPIs == null || dto.SubKPIs.Count == 0)
                 return BadRequest("Data incomplete.");
 
+            // 1. User ne jo Main KPI ka weight allot kiya (e.g., 30)
+            // Front-end se 'RequestedKPIWeight' aa raha hai
+            decimal mainKpiTargetWeight = (decimal)dto.RequestedKPIWeight;
+
+            // 2. Sub-KPIs ka total input jo user ne list mein dala (e.g., 40)
+            decimal subKpiTotalInput = dto.SubKPIs.Sum(s => (decimal)s.Weight);
+
+            if (mainKpiTargetWeight >= 100)
+                return BadRequest("Main KPI weight 100 se kam hona chahiye.");
+
             try
             {
                 using (var scope = new TransactionScope())
                 {
-                    // 1. Create Main KPI (Agar pehle se nahi hai)
+                    // 3. Create Main KPI
                     KPI kpi = new KPI { name = dto.KPIName, KPI_Employeetype = dto.EmployeeTypeId };
                     db.KPI.Add(kpi);
                     db.SaveChanges();
 
-                    // 2. Add Sub-KPIs
+                    // 4. Sub-KPI Adjustment Factor Calculate karein
+                    // Agar Target 30 hai aur Input 40, toh factor = 0.75
+                    decimal subFactor = subKpiTotalInput > 0 ? mainKpiTargetWeight / subKpiTotalInput : 0;
+
+                    // 5. Sub-KPIs ko "Scaled" weight ke sath save karein
                     foreach (var subDto in dto.SubKPIs)
                     {
                         var subObj = new SubKPI { KPIID = kpi.id, name = subDto.Name };
                         db.SubKPI.Add(subObj);
-                        db.SaveChanges(); // ID generate karne ke liye
+                        db.SaveChanges();
 
-                        // Initial weight save karein (Backend ise adjust karega niche)
+                        // Har Sub-KPI ka weight ab 30% ke andar fit ho jayega
+                        decimal adjustedSubWeight = (decimal)subDto.Weight * subFactor;
+
                         db.SessionKPIWeight.Add(new SessionKPIWeight
                         {
                             SessionID = dto.SessionId,
                             KPIID = kpi.id,
                             SubKPIID = subObj.id,
-                            Weight = (int)subDto.Weight // Initial input
+                            Weight = (int)Math.Round(adjustedSubWeight, MidpointRounding.AwayFromZero)
                         });
                     }
                     db.SaveChanges();
 
-                    // 3. GLOBAL ADJUSTMENT (The 100% Rule for Category)
-                    // Is Category (EmployeeType) ke saare KPIs nikaalein jo is Session mein hain
-                    var allWeightsInCategory = db.SessionKPIWeight
-                        .Where(w => w.SessionID == dto.SessionId &&
-                                    db.KPI.Any(k => k.id == w.KPIID && k.KPI_Employeetype == dto.EmployeeTypeId))
-                        .ToList();
-
-                    decimal currentGrandTotal = allWeightsInCategory.Sum(w => (decimal)(w.Weight ?? 0));
-
-                    if (currentGrandTotal > 0)
+                    // 6. Rounding Correction for Sub-KPIs (Check if sum is exactly 30)
+                    var currentKpiWeights = db.SessionKPIWeight
+                        .Where(w => w.SessionID == dto.SessionId && w.KPIID == kpi.id).ToList();
+                    int currentKpiSum = currentKpiWeights.Sum(w => w.Weight ?? 0);
+                    if (currentKpiSum != (int)mainKpiTargetWeight && currentKpiWeights.Any())
                     {
-                        // Factor calculation: Target 100 / Jo abhi total hai
-                        decimal factor = 100m / currentGrandTotal;
-
-                        foreach (var w in allWeightsInCategory)
-                        {
-                            decimal adjusted = (decimal)(w.Weight ?? 0) * factor;
-                            // Rounding away from zero to keep it clean
-                            w.Weight = (int)Math.Round(adjusted, MidpointRounding.AwayFromZero);
-                        }
+                        int diff = (int)mainKpiTargetWeight - currentKpiSum;
+                        currentKpiWeights.First().Weight += diff;
                         db.SaveChanges();
                     }
 
-                    // 4. FINAL CHECK (Rounding Error Fix)
-                    // Kabhi kabhi rounding ki wajah se total 101 ya 99 ho jata hai. 
-                    // Hum aakhri element mein difference adjust kar dete hain.
-                    var finalWeights = db.SessionKPIWeight
+                    // 7. GLOBAL ADJUSTMENT (Purani KPIs ko 100% rule ke liye adjust karein)
+                    var existingWeights = db.SessionKPIWeight
+                        .Where(w => w.SessionID == dto.SessionId &&
+                                    w.KPIID != kpi.id &&
+                                    db.KPI.Any(k => k.id == w.KPIID && k.KPI_Employeetype == dto.EmployeeTypeId))
+                        .ToList();
+
+                    if (existingWeights.Any())
+                    {
+                        decimal currentOldTotal = existingWeights.Sum(w => (decimal)(w.Weight ?? 0));
+                        decimal targetForOld = 100m - mainKpiTargetWeight;
+
+                        if (currentOldTotal > 0)
+                        {
+                            decimal globalFactor = targetForOld / currentOldTotal;
+                            foreach (var w in existingWeights)
+                            {
+                                decimal adjusted = (decimal)(w.Weight ?? 0) * globalFactor;
+                                w.Weight = (int)Math.Round(adjusted, MidpointRounding.AwayFromZero);
+                            }
+                            db.SaveChanges();
+                        }
+                    }
+
+                    // 8. FINAL GLOBAL PRECISION CHECK (Total must be exactly 100)
+                    var allWeights = db.SessionKPIWeight
                         .Where(w => w.SessionID == dto.SessionId &&
                                     db.KPI.Any(k => k.id == w.KPIID && k.KPI_Employeetype == dto.EmployeeTypeId))
                         .ToList();
 
-                    int finalSum = finalWeights.Sum(w => w.Weight ?? 0);
-                    if (finalSum != 100 && finalWeights.Count > 0)
+                    int finalSum = allWeights.Sum(w => w.Weight ?? 0);
+                    if (finalSum != 100 && existingWeights.Any())
                     {
                         int diff = 100 - finalSum;
-                        finalWeights.First().Weight += diff; // Pehle item mein adjustment add/sub kardein
+                        existingWeights.First().Weight += diff;
                         db.SaveChanges();
                     }
 
                     scope.Complete();
-                    return Ok(new { Message = "KPI Saved and Weights Adjusted to exactly 100%.", Status = "Success" });
+                    return Ok(new { Message = "KPI Saved. Sub-KPIs scaled to fit KPI weight.", Status = "Success" });
                 }
             }
             catch (Exception ex)
             {
-                return InternalServerError(new Exception("Adjustment Failed: " + ex.Message));
+                return InternalServerError(new Exception("Error: " + ex.Message));
             }
         }
+
 
 
 
@@ -155,12 +182,18 @@ namespace FYP.Controllers.HOD
         [HttpGet]
         [Route("sessions")]
         public IHttpActionResult GetSessions() => Ok(db.Session.Select(s => new { s.id, s.name }).ToList());
-    
+
+
+
+        [HttpGet]
+        [Route("emptypes")]
+        public IHttpActionResult GetEmpTypes() => Ok(db.EmployeeType.Select(e => new { e.id, e.type }).ToList());
 
 
 
 
 
 
-}
+
+    }
 }

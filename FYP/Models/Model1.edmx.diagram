@@ -51,6 +51,8 @@
         <AssociationConnector Association="FYPModel.FK__SessionKP__KPIID__17F790F9" />
         <AssociationConnector Association="FYPModel.FK__SessionKP__Sessi__17036CC0" />
         <AssociationConnector Association="FYPModel.FK__SessionKP__SubKP__18EBB532" />
+        <EntityTypeShape EntityType="FYPModel.Questions" Width="1.5" PointX="11.75" PointY="3.25" />
+        <AssociationConnector Association="FYPModel.FK_Questions_Questionare" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
