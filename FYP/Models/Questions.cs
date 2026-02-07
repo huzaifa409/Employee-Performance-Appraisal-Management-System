@@ -17,7 +17,6 @@ namespace FYP.Models
         public int QuestionID { get; set; }
         public int QuestionareID { get; set; }
         public string QuestionText { get; set; }
-        public Nullable<int> score { get; set; }
     
         public virtual Questionare Questionare { get; set; }
     }

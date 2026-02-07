@@ -7,8 +7,7 @@ namespace FYP.Models.DTO
 {
     public class QuestionCreateDto
     {
-        public string QuestionText { get; set; }
-        public int Score { get; set; }
-        public string QuestionareType { get; set; }
+        public string EvaluationType { get; set; }
+        public List<string> Questions { get; set; }
     }
 }

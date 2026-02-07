@@ -9,58 +9,50 @@ using FYP.Models.DTO;
 
 namespace FYP.Controllers.DIRECTOR
 {
-    public class QuestionaireController : ApiController
+    [RoutePrefix("api/Questionnaire")]
+    public class QuestionnaireController : ApiController
     {
         FYPEntities db = new FYPEntities();
 
-
-        // POST: api/Questions
         [HttpPost]
-        [Route("api/Questions")]
-        public IHttpActionResult CreateQuestion(QuestionCreateDto dto)
+        [Route("Create")]
+        public IHttpActionResult CreateQuestionnaire(QuestionCreateDto model)
         {
-            if (dto == null || string.IsNullOrEmpty(dto.QuestionText) || string.IsNullOrEmpty(dto.QuestionareType))
-                return BadRequest("Invalid input");
-
-            // Check if Questionare type exists
-            var questionare = db.Questionare.FirstOrDefault(q => q.type == dto.QuestionareType);
-            if (questionare == null)
+            if (model == null || model.Questions == null || model.Questions.Count == 0)
             {
-                questionare = new Questionare { type = dto.QuestionareType };
-                db.Questionare.Add(questionare);
-                db.SaveChanges(); // save to get Id
+                return BadRequest("Invalid data");
             }
 
-            var question = new Questions
+            // 1️⃣ Create Questionnaire
+            var questionnaire = new Questionare
             {
-                QuestionText = dto.QuestionText,
-                score = dto.Score,
-                QuestionareID = questionare.id
+                type = model.EvaluationType ,// OR map to text if needed
+                flag = "0" // DEFAULT — DO NOT CHANGE
             };
 
-            db.Questions.Add(question);
+            db.Questionare.Add(questionnaire);
+            db.SaveChanges(); // 🔥 ID generated here
+
+            // 2️⃣ Insert Questions
+            foreach (var q in model.Questions)
+            {
+                var question = new Questions
+                {
+                    QuestionareID = questionnaire.id,
+                    QuestionText = q
+                };
+
+                db.Questions.Add(question);
+            }
+
             db.SaveChanges();
 
-            return Ok(new { Message = "Question added successfully", QuestionID = question.QuestionID });
+            return Ok(new
+            {
+                message = "Questionnaire saved successfully",
+                QuestionnaireId = questionnaire.id
+            });
         }
-
-        // GET: api/Questions
-        [HttpGet]
-        [Route("api/Questions")]
-        public IHttpActionResult GetAllQuestions()
-        {
-            var result = db.Questions
-                .Select(q => new
-                {
-                    q.QuestionID,
-                    q.QuestionText,
-                    q.score,
-                    QuestionareType = q.Questionare.type
-                })
-                .ToList();
-
-            return Ok(result);
-        }
-
     }
-    }
+
+}

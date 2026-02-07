@@ -24,6 +24,7 @@ namespace FYP.Models
     
         public int id { get; set; }
         public string type { get; set; }
+        public string flag { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<PeerEvaluation> PeerEvaluation { get; set; }

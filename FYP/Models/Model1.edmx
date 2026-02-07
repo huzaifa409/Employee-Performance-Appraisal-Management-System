@@ -90,6 +90,7 @@
           </Key>
           <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="type" Type="varchar" MaxLength="50" />
+          <Property Name="flag" Type="varchar" MaxLength="10" />
         </EntityType>
         <EntityType Name="Questions">
           <Key>
@@ -98,7 +99,6 @@
           <Property Name="QuestionID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="QuestionareID" Type="int" Nullable="false" />
           <Property Name="QuestionText" Type="nvarchar" MaxLength="500" Nullable="false" />
-          <Property Name="score" Type="int" />
         </EntityType>
         <EntityType Name="Session">
           <Key>
@@ -782,6 +782,7 @@
           <NavigationProperty Name="PeerEvaluation" Relationship="Self.FK__PeerEvalu__quest__0B91BA14" FromRole="Questionare" ToRole="PeerEvaluation" />
           <NavigationProperty Name="StudentEvaluation" Relationship="Self.FK__StudentEv__quest__02FC7413" FromRole="Questionare" ToRole="StudentEvaluation" />
           <NavigationProperty Name="Questions" Relationship="FYPModel.FK_Questions_Questionare" FromRole="Questionare" ToRole="Questions" />
+          <Property Name="flag" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="Session">
           <Key>
@@ -1364,7 +1365,6 @@
           <Property Name="QuestionID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="QuestionareID" Type="Int32" Nullable="false" />
           <Property Name="QuestionText" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
-          <Property Name="score" Type="Int32" />
           <NavigationProperty Name="Questionare" Relationship="FYPModel.FK_Questions_Questionare" FromRole="Questions" ToRole="Questionare" />
         </EntityType>
         <Association Name="FK_Questions_Questionare">
@@ -1476,6 +1476,7 @@
           <EntitySetMapping Name="Questionare">
             <EntityTypeMapping TypeName="FYPModel.Questionare">
               <MappingFragment StoreEntitySet="Questionare">
+                <ScalarProperty Name="flag" ColumnName="flag" />
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="type" ColumnName="type" />
               </MappingFragment>
@@ -1551,7 +1552,6 @@
           <EntitySetMapping Name="Questions">
             <EntityTypeMapping TypeName="FYPModel.Questions">
               <MappingFragment StoreEntitySet="Questions">
-                <ScalarProperty Name="score" ColumnName="score" />
                 <ScalarProperty Name="QuestionText" ColumnName="QuestionText" />
                 <ScalarProperty Name="QuestionareID" ColumnName="QuestionareID" />
                 <ScalarProperty Name="QuestionID" ColumnName="QuestionID" />
