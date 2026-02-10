@@ -110,6 +110,88 @@ namespace FYP.Controllers.DIRECTOR
             return Ok(new { message = "Status updated successfully" });
         }
 
+
+        [HttpPost]
+        [Route("SaveAllChanges")]
+        public IHttpActionResult SaveAllChanges(SaveQuestionnaireChangesDto model)
+        {
+            if (model == null)
+                return BadRequest("Invalid data");
+
+            // 1️⃣ DELETE REMOVED QUESTIONS
+            if (model.DeletedIds != null && model.DeletedIds.Count > 0)
+            {
+                var deleteQuestions = db.Questions
+                    .Where(q => model.DeletedIds.Contains(q.QuestionID))
+                    .ToList();
+
+                db.Questions.RemoveRange(deleteQuestions);
+            }
+
+            // 2️⃣ ADD & UPDATE QUESTIONS
+            foreach (var q in model.Questions)
+            {
+                if (q.Id == 0)
+                {
+                    // ➕ NEW QUESTION
+                    var newQuestion = new Questions
+                    {
+                        QuestionareID = model.QuestionnaireId,
+                        QuestionText = q.QuestionText
+                    };
+                    db.Questions.Add(newQuestion);
+                }
+                else
+                {
+                    // ✏️ UPDATE EXISTING QUESTION
+                    var existing = db.Questions.Find(q.Id);
+                    if (existing != null)
+                    {
+                        existing.QuestionText = q.QuestionText;
+                    }
+                }
+            }
+
+            db.SaveChanges();
+
+            return Ok(new
+            {
+                message = "Questionnaire updated successfully"
+            });
+        }
+
+
+
+        [HttpGet]
+        [Route("GetById/{id}")]
+        public IHttpActionResult GetById(int id)
+        {
+            var questionnaire = db.Questionare
+                .Where(q => q.id == id)
+                .Select(q => new
+                {
+                    id = q.id,
+                    title = q.type, // You don't have a separate title field, so using 'type' here
+                    evaluationType = q.type,
+                    questions = q.Questions.Select(qq => new
+                    {
+                        id = qq.QuestionID,
+                        questionText = qq.QuestionText
+                    }).ToList()
+                })
+                .FirstOrDefault();
+
+            if (questionnaire == null)
+                return NotFound();
+
+            return Ok(questionnaire);
+        }
+
+
+
+
+
+
     }
 
 }
