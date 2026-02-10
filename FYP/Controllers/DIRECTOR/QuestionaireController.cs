@@ -26,7 +26,7 @@ namespace FYP.Controllers.DIRECTOR
             // 1️⃣ Create Questionnaire
             var questionnaire = new Questionare
             {
-                type = model.EvaluationType ,// OR map to text if needed
+                type = model.EvaluationType ,
                 flag = "0" // DEFAULT — DO NOT CHANGE
             };
 
@@ -53,6 +53,63 @@ namespace FYP.Controllers.DIRECTOR
                 QuestionnaireId = questionnaire.id
             });
         }
+
+
+
+        [HttpGet]
+        [Route("GetAll")]
+        public IHttpActionResult GetAll()
+        {
+            var data = db.Questionare
+                .Select(q => new QuestionnaireListDto
+                {
+                    Id = q.id,
+                    Type = q.type,
+                    Flag = q.flag,
+                    QuestionCount = q.Questions.Count()
+                })
+                .ToList();
+
+            return Ok(data);
+        }
+
+
+
+        [HttpPost]
+        [Route("Toggle")]
+        public IHttpActionResult ToggleQuestionnaire(ToggleQuestionnaireDto model)
+        {
+            var questionnaire = db.Questionare.Find(model.QuestionnaireId);
+
+            if (questionnaire == null)
+                return NotFound();
+
+            if (model.TurnOn)
+            {
+                // ❌ Check if same type is already ON
+                bool alreadyActive = db.Questionare.Any(q =>
+                    q.type == questionnaire.type &&
+                    q.flag == "1" &&
+                    q.id != questionnaire.id
+                );
+
+                if (alreadyActive)
+                {
+                    return BadRequest("Another evaluation of this type is already active.");
+                }
+
+                questionnaire.flag = "1";
+            }
+            else
+            {
+                questionnaire.flag = "0";
+            }
+
+            db.SaveChanges();
+
+            return Ok(new { message = "Status updated successfully" });
+        }
+
     }
 
 }
