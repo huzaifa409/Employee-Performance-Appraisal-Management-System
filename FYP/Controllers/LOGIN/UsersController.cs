@@ -28,7 +28,7 @@ namespace FYP.Controllers.LOGIN
 
             }
 
-            return Request.CreateResponse(HttpStatusCode.OK, new {message = "LoginSuccessful", role =res.role});
+            return Request.CreateResponse(HttpStatusCode.OK, new {message = "LoginSuccessful", role =res.role,userId = res.id});
 
         }
     }

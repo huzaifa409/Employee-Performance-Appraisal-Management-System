@@ -1,8 +1,9 @@
-﻿using System;
+﻿using FYP.Models;
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Web.Http;
-using System.Data.Entity;
-using FYP.Models;
 
 namespace FYP.Controllers.Teacher
 {
@@ -71,6 +72,73 @@ namespace FYP.Controllers.Teacher
 
             return Ok(data);
         }
+
+
+        [HttpGet]
+        [Route("IsEvaluator")]
+        public IHttpActionResult IsEvaluator(int userId)
+        {
+            // Convert userId to string to match teacherID type
+            var exists = db.PeerEvaluator.Any(e => e.teacherID == userId.ToString());
+
+            return Ok(new
+            {
+                isEvaluator = exists
+            });
+        }
+
+
+        [HttpPost]
+        [Route("SubmitEvaluation")]
+        public IHttpActionResult SubmitEvaluation([FromBody] List<PeerEvaluation> evaluations)
+        {
+            if (evaluations == null || !evaluations.Any())
+                return BadRequest("Invalid submission");
+
+            foreach (var eval in evaluations)
+            {
+                var record = new PeerEvaluation
+                {
+                    evaluatorID = eval.evaluatorID,
+                    evaluateeID = eval.evaluateeID,
+                    questionID = eval.questionID,
+                    courseCode = eval.courseCode,
+                    score = eval.score
+                };
+
+                db.PeerEvaluation.Add(record);
+            }
+
+            db.SaveChanges();
+
+            return Ok(new { success = true });
+        }
+
+
+
+
+        [HttpGet]
+        [Route("GetSubmittedEvaluations")]
+        public IHttpActionResult GetSubmittedEvaluations(int evaluatorID)
+        {
+            // fetch all submitted evaluations for this evaluator
+            var submitted = db.PeerEvaluation
+                .Where(p => p.evaluatorID == evaluatorID)
+                .Select(p => new
+                {
+                    TeacherID = p.evaluateeID, // if your evaluateeID is int, adjust type
+                    CourseCode = p.courseCode
+                })
+                .Distinct() // one entry per course per teacher
+                .ToList();
+
+            return Ok(submitted);
+        }
+
+
+
+
+
 
     }
 }
