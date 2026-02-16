@@ -131,12 +131,14 @@
     <Compile Include="Controllers\DATACELL\Enrollment\EnrollmentController.cs" />
     <Compile Include="Controllers\DATACELL\Student\CourseController.cs" />
     <Compile Include="Controllers\DATACELL\Student\StudentController.cs" />
+    <Compile Include="Controllers\DATACELL\Student\StudentEvaluationController.cs" />
     <Compile Include="Controllers\DATACELL\Teacher\TeacherController.cs" />
     <Compile Include="Controllers\DIRECTOR\QuestionaireController.cs" />
     <Compile Include="Controllers\HOD\CourseManagementController.cs" />
     <Compile Include="Controllers\HOD\KPIController.cs" />
     <Compile Include="Controllers\HOD\PeerEvaluatorsController.cs" />
     <Compile Include="Controllers\LOGIN\UsersController.cs" />
+    <Compile Include="Controllers\Teacher\TeacherDashboardController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -148,6 +150,7 @@
     </Compile>
     <Compile Include="Models\DTO\AddKpiDto.cs" />
     <Compile Include="Models\DTO\AddPeerEvaluatorDto.cs" />
+    <Compile Include="Models\DTO\StudentEvalatuationDto.cs" />
     <Compile Include="Models\DTO\QuestionCreateDto.cs" />
     <Compile Include="Models\DTO\QuestionnaireListDto.cs" />
     <Compile Include="Models\DTO\SaveQuestionnaireChangesDto.cs" />
