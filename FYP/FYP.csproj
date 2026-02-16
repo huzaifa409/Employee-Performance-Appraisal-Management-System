@@ -138,6 +138,7 @@
     <Compile Include="Controllers\HOD\KPIController.cs" />
     <Compile Include="Controllers\HOD\PeerEvaluatorsController.cs" />
     <Compile Include="Controllers\LOGIN\UsersController.cs" />
+    <Compile Include="Controllers\Student\StudentDashboardController.cs" />
     <Compile Include="Controllers\Teacher\TeacherDashboardController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -150,6 +151,7 @@
     </Compile>
     <Compile Include="Models\DTO\AddKpiDto.cs" />
     <Compile Include="Models\DTO\AddPeerEvaluatorDto.cs" />
+    <Compile Include="Models\DTO\StudentEnrollementDto.cs" />
     <Compile Include="Models\DTO\StudentEvalatuationDto.cs" />
     <Compile Include="Models\DTO\QuestionCreateDto.cs" />
     <Compile Include="Models\DTO\QuestionnaireListDto.cs" />

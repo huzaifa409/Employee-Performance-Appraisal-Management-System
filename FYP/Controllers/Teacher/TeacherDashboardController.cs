@@ -1,4 +1,5 @@
 ﻿using FYP.Models;
+using FYP.Models.DTO;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -14,15 +15,15 @@ namespace FYP.Controllers.Teacher
 
         // GET: api/TeacherDashboard/GetActiveQuestionnaire
         [HttpGet]
-        [Route("GetActiveQuestionnaire")]
-        public IHttpActionResult GetActiveQuestionnaire()
+        [Route("GetActiveQuestionnaire/{type}")]
+        public IHttpActionResult GetActiveQuestionnaire(string type)
         {
             try
             {
                 // Get Questionnaire where flag = '1'
                 var questionnaire = db.Questionare
                     .Include(q => q.Questions)
-                    .Where(q => q.flag == "1")
+                    .Where(q => q.flag == "1" && q.type == type)
                     .Select(q => new
                     {
                         QuestionareID = q.id,
@@ -135,6 +136,10 @@ namespace FYP.Controllers.Teacher
             return Ok(submitted);
         }
 
+
+
+
+        
 
 
 

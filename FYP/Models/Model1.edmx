@@ -364,18 +364,6 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__PeerEvalu__quest__0A9D95DB">
-          <End Role="Questionare" Type="Self.Questionare" Multiplicity="0..1" />
-          <End Role="PeerEvaluation" Type="Self.PeerEvaluation" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Questionare">
-              <PropertyRef Name="id" />
-            </Principal>
-            <Dependent Role="PeerEvaluation">
-              <PropertyRef Name="questionID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK__PeerEvalu__sessi__05D8E0BE">
           <End Role="Session" Type="Self.Session" Multiplicity="0..1" />
           <End Role="PeerEvaluator" Type="Self.PeerEvaluator" Multiplicity="*" />
@@ -508,6 +496,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_PeerEvaluation_Questions">
+          <End Role="Questions" Type="Self.Questions" Multiplicity="0..1" />
+          <End Role="PeerEvaluation" Type="Self.PeerEvaluation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Questions">
+              <PropertyRef Name="QuestionID" />
+            </Principal>
+            <Dependent Role="PeerEvaluation">
+              <PropertyRef Name="questionID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Questions_Questionare">
           <End Role="Questionare" Type="Self.Questionare" Multiplicity="1" />
           <End Role="Questions" Type="Self.Questions" Multiplicity="*" />
@@ -607,10 +607,6 @@
             <End Role="Teacher" EntitySet="Teacher" />
             <End Role="PeerEvaluation" EntitySet="PeerEvaluation" />
           </AssociationSet>
-          <AssociationSet Name="FK__PeerEvalu__quest__0A9D95DB" Association="Self.FK__PeerEvalu__quest__0A9D95DB">
-            <End Role="Questionare" EntitySet="Questionare" />
-            <End Role="PeerEvaluation" EntitySet="PeerEvaluation" />
-          </AssociationSet>
           <AssociationSet Name="FK__PeerEvalu__sessi__05D8E0BE" Association="Self.FK__PeerEvalu__sessi__05D8E0BE">
             <End Role="Session" EntitySet="Session" />
             <End Role="PeerEvaluator" EntitySet="PeerEvaluator" />
@@ -654,6 +650,10 @@
           <AssociationSet Name="FK__Teacher__userID__74AE54BC" Association="Self.FK__Teacher__userID__74AE54BC">
             <End Role="Users" EntitySet="Users" />
             <End Role="Teacher" EntitySet="Teacher" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PeerEvaluation_Questions" Association="Self.FK_PeerEvaluation_Questions">
+            <End Role="Questions" EntitySet="Questions" />
+            <End Role="PeerEvaluation" EntitySet="PeerEvaluation" />
           </AssociationSet>
           <AssociationSet Name="FK_Questions_Questionare" Association="Self.FK_Questions_Questionare">
             <End Role="Questionare" EntitySet="Questionare" />
@@ -761,6 +761,7 @@
           <NavigationProperty Name="PeerEvaluator" Relationship="Self.FK__PeerEvalu__evalu__09A971A2" FromRole="PeerEvaluation" ToRole="PeerEvaluator" />
           <NavigationProperty Name="Teacher" Relationship="Self.FK__PeerEvalu__evalu__0A9D95DB" FromRole="PeerEvaluation" ToRole="Teacher" />
           <NavigationProperty Name="Questionare" Relationship="Self.FK__PeerEvalu__quest__0B91BA14" FromRole="PeerEvaluation" ToRole="Questionare" />
+          <NavigationProperty Name="Questions" Relationship="FYPModel.FK_PeerEvaluation_Questions" FromRole="PeerEvaluation" ToRole="Questions" />
         </EntityType>
         <EntityType Name="PeerEvaluator">
           <Key>
@@ -1296,6 +1297,10 @@
             <End Role="Questionare" EntitySet="Questionare" />
             <End Role="Questions" EntitySet="Questions" />
           </AssociationSet>
+          <AssociationSet Name="FK_PeerEvaluation_Questions" Association="FYPModel.FK_PeerEvaluation_Questions">
+            <End Role="Questions" EntitySet="Questions" />
+            <End Role="PeerEvaluation" EntitySet="PeerEvaluation" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="SessionKPIWeight">
           <Key>
@@ -1366,6 +1371,7 @@
           <Property Name="QuestionareID" Type="Int32" Nullable="false" />
           <Property Name="QuestionText" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="Questionare" Relationship="FYPModel.FK_Questions_Questionare" FromRole="Questions" ToRole="Questionare" />
+          <NavigationProperty Name="PeerEvaluation" Relationship="FYPModel.FK_PeerEvaluation_Questions" FromRole="Questions" ToRole="PeerEvaluation" />
         </EntityType>
         <Association Name="FK_Questions_Questionare">
           <End Type="FYPModel.Questionare" Role="Questionare" Multiplicity="1" />
@@ -1376,6 +1382,18 @@
             </Principal>
             <Dependent Role="Questions">
               <PropertyRef Name="QuestionareID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PeerEvaluation_Questions">
+          <End Type="FYPModel.Questions" Role="Questions" Multiplicity="0..1" />
+          <End Type="FYPModel.PeerEvaluation" Role="PeerEvaluation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Questions">
+              <PropertyRef Name="QuestionID" />
+            </Principal>
+            <Dependent Role="PeerEvaluation">
+              <PropertyRef Name="questionID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
