@@ -18,6 +18,7 @@ namespace FYP.Models
         public Questions()
         {
             this.PeerEvaluation = new HashSet<PeerEvaluation>();
+            this.StudentEvaluation = new HashSet<StudentEvaluation>();
         }
     
         public int QuestionID { get; set; }
@@ -27,5 +28,7 @@ namespace FYP.Models
         public virtual Questionare Questionare { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<PeerEvaluation> PeerEvaluation { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<StudentEvaluation> StudentEvaluation { get; set; }
     }
 }

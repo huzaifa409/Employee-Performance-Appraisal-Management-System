@@ -54,6 +54,8 @@
         <EntityTypeShape EntityType="FYPModel.Questions" Width="1.5" PointX="9.875" PointY="0.625" />
         <AssociationConnector Association="FYPModel.FK_Questions_Questionare" />
         <AssociationConnector Association="FYPModel.FK_PeerEvaluation_Questions" />
+        <AssociationConnector Association="FYPModel.FK_StudentEvaluation_Questions" />
+        <AssociationConnector Association="FYPModel.FK_StudentEvaluation_Student" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

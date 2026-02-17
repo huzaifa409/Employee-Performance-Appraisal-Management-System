@@ -1,4 +1,5 @@
 ﻿using FYP.Models;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
 
@@ -50,5 +51,49 @@ namespace FYP.Controllers.Student
                 return NotFound();
             return Ok(student.name);
         }
+
+
+
+        [HttpPost]
+        [Route("SubmitStudentEvaluation")]
+        public IHttpActionResult SubmitStudentEvaluation(
+    [FromBody] List<StudentEvaluation> evaluations)
+        {
+            if (evaluations == null || !evaluations.Any())
+                return BadRequest("Invalid submission");
+
+            foreach (var e in evaluations)
+            {
+                db.StudentEvaluation.Add(new StudentEvaluation
+                {
+                    enrollmentID = e.enrollmentID,
+                    questionID = e.questionID,
+                    score = e.score,
+                    StudentId = e.StudentId
+                });
+            }
+
+            db.SaveChanges();
+
+            return Ok(new { success = true });
+        }
+
+
+
+
+        [HttpGet]
+        [Route("GetSubmittedStudentEvaluations/{studentId}")]
+        public IHttpActionResult GetSubmittedStudentEvaluations(string studentId)
+        {
+            var submitted = db.StudentEvaluation
+                .Where(se => se.StudentId.Trim().ToLower() == studentId.Trim().ToLower())
+                .Select(se => se.enrollmentID)
+                .Distinct()
+                .ToList();
+
+            return Ok(submitted);
+        }
+
     }
+
 }

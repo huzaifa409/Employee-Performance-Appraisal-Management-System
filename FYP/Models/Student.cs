@@ -18,6 +18,7 @@ namespace FYP.Models
         public Student()
         {
             this.Enrollment = new HashSet<Enrollment>();
+            this.StudentEvaluation = new HashSet<StudentEvaluation>();
         }
     
         public string userID { get; set; }
@@ -28,5 +29,7 @@ namespace FYP.Models
         public virtual ICollection<Enrollment> Enrollment { get; set; }
         public virtual Session Session { get; set; }
         public virtual Users Users { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<StudentEvaluation> StudentEvaluation { get; set; }
     }
 }
