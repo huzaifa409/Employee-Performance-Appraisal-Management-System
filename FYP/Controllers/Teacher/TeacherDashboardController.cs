@@ -23,7 +23,7 @@ namespace FYP.Controllers.Teacher
                 // Get Questionnaire where flag = '1'
                 var questionnaire = db.Questionare
                     .Include(q => q.Questions)
-                    .Where(q => q.flag == "1" && q.type == type)
+                    .Where(q =>q.flag == "1" &&q.type.Trim().ToLower() == type.Trim().ToLower())
                     .Select(q => new
                     {
                         QuestionareID = q.id,
@@ -77,10 +77,11 @@ namespace FYP.Controllers.Teacher
 
         [HttpGet]
         [Route("IsEvaluator")]
-        public IHttpActionResult IsEvaluator(int userId)
+        public IHttpActionResult IsEvaluator(string userId)
         {
-            // Convert userId to string to match teacherID type
-            var exists = db.PeerEvaluator.Any(e => e.teacherID == userId.ToString());
+            
+            var exists = db.PeerEvaluator.Any(e => e.teacherID.Trim().ToLower() == userId.Trim().ToLower());
+
 
             return Ok(new
             {
@@ -137,9 +138,41 @@ namespace FYP.Controllers.Teacher
         }
 
 
+[HttpGet]
+[Route("GetTeacherName/{teacherId}")]
+public IHttpActionResult GetTeacherName(string teacherId)
+{
+    var teacher = db.Teacher.FirstOrDefault(s => s.userID.Trim().ToLower() == teacherId.Trim().ToLower());
+    if (teacher == null)
+        return NotFound();
+    return Ok(teacher.name);
+}
 
 
-        
+
+
+        [HttpGet]
+        [Route("GetPeerEvaluatorID")]
+        public IHttpActionResult GetPeerEvaluatorID(string userId)
+        {
+            try
+            {
+                // Get the PeerEvaluator entry for this teacher (you may also filter by current session)
+                var peerEvaluator = db.PeerEvaluator
+                    .FirstOrDefault(pe => pe.teacherID.Trim().ToLower() == userId.Trim().ToLower());
+
+                if (peerEvaluator == null)
+                    return Ok(new { peerEvaluatorID = (int?)null });
+
+                return Ok(new { peerEvaluatorID = peerEvaluator.id });
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+        }
+
+
 
 
 

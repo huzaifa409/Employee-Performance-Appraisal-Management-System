@@ -1,5 +1,4 @@
 ﻿using FYP.Models;
-using FYP.Models.DTO;
 using System.Linq;
 using System.Web.Http;
 
@@ -15,29 +14,41 @@ namespace FYP.Controllers.Student
         [Route("enrollments/{studentID}")]
         public IHttpActionResult GetEnrollmentsByStudent(string studentID)
         {
-            // Fetch all enrollment records for the given studentID
             var enrollments = db.Enrollment
-                                .Where(e => e.studentID == studentID)
-                                .Select(e => new
-                                {
-                                    e.id,
-                                    e.studentID,
-                                    e.teacherID,
-                                    e.courseCode,
-                                    e.sessionID
-                                })
-                                .ToList();
+                .Where(e => e.studentID == studentID)
+                .Select(e => new
+                {
+                    EnrollmentID = e.id,
 
-            if (enrollments == null || enrollments.Count == 0)
+                    CourseCode = e.courseCode,
+                    CourseTitle = e.Course.title,      
+
+                    TeacherID = e.teacherID,
+                    TeacherName = e.Teacher.name,  
+
+                    SessionID = e.sessionID,
+                    SessionName = e.Session.name       
+                })
+                .ToList();
+
+            if (!enrollments.Any())
             {
-                return NotFound(); // 404 if no records found
+                return NotFound();
             }
 
-            return Ok(enrollments); // 200 OK with JSON data
+            return Ok(enrollments);
         }
 
 
 
-      
+        [HttpGet]
+        [Route("GetStudentName/{studentId}")]
+        public IHttpActionResult GetStudentName(string studentId)
+        {
+            var student = db.Student.FirstOrDefault(s => s.userID == studentId);
+            if (student == null)
+                return NotFound();
+            return Ok(student.name);
+        }
     }
 }
