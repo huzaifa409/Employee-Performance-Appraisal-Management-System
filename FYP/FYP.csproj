@@ -138,9 +138,11 @@
     <Compile Include="Controllers\HOD\CourseManagementController.cs" />
     <Compile Include="Controllers\HOD\KPIController.cs" />
     <Compile Include="Controllers\HOD\PeerEvaluatorsController.cs" />
+    <Compile Include="Controllers\HOD\PerformanceController.cs" />
     <Compile Include="Controllers\LOGIN\UsersController.cs" />
     <Compile Include="Controllers\Student\StudentDashboardController.cs" />
     <Compile Include="Controllers\Teacher\TeacherDashboardController.cs" />
+    <Compile Include="Controllers\Teacher\TeacherPerformanceController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>

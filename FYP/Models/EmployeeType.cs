@@ -18,6 +18,7 @@ namespace FYP.Models
         public EmployeeType()
         {
             this.KPI = new HashSet<KPI>();
+            this.EmployeSessionKPI = new HashSet<EmployeSessionKPI>();
         }
     
         public int id { get; set; }
@@ -25,5 +26,7 @@ namespace FYP.Models
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<KPI> KPI { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<EmployeSessionKPI> EmployeSessionKPI { get; set; }
     }
 }

@@ -24,11 +24,13 @@ namespace FYP.Models
         public Nullable<int> KPIID { get; set; }
         public Nullable<int> SubKPIID { get; set; }
         public Nullable<int> SessionID { get; set; }
+        public Nullable<int> EmployeeTypeID { get; set; }
     
         public virtual KPI KPI { get; set; }
         public virtual Session Session { get; set; }
         public virtual SubKPI SubKPI { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<KPIScore> KPIScore { get; set; }
+        public virtual EmployeeType EmployeeType { get; set; }
     }
 }

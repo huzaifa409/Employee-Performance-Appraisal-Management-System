@@ -57,6 +57,7 @@
         <AssociationConnector Association="FYPModel.FK_StudentEvaluation_Questions" />
         <AssociationConnector Association="FYPModel.FK_StudentEvaluation_Student" />
         <EntityTypeShape EntityType="FYPModel.Email" Width="1.5" PointX="6.375" PointY="0.75" />
+        <AssociationConnector Association="FYPModel.FK__EmployeSe__Emplo__0697FACD" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
