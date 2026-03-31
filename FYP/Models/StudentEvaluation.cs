@@ -19,9 +19,11 @@ namespace FYP.Models
         public Nullable<int> questionID { get; set; }
         public Nullable<int> score { get; set; }
         public string StudentId { get; set; }
+        public Nullable<int> SessionID { get; set; }
     
         public virtual Enrollment Enrollment { get; set; }
         public virtual Questions Questions { get; set; }
         public virtual Student Student { get; set; }
+        public virtual Session Session { get; set; }
     }
 }

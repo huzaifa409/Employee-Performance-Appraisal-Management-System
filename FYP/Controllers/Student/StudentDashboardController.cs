@@ -19,27 +19,33 @@ namespace FYP.Controllers.Student
         [Route("enrollments/{studentID}")]
         public IHttpActionResult GetEnrollmentsByStudent(string studentID)
         {
+            // 🔹 Step 1: Get latest session (descending)
+            var latestSession = db.Session
+                .OrderByDescending(s => s.id)
+                .FirstOrDefault();
+
+            if (latestSession == null)
+                return NotFound();
+
+            // 🔹 Step 2: Filter enrollments by student + latest session
             var enrollments = db.Enrollment
-                .Where(e => e.studentID == studentID)
+                .Where(e => e.studentID == studentID && e.sessionID == latestSession.id)
                 .Select(e => new
                 {
                     EnrollmentID = e.id,
-
                     CourseCode = e.courseCode,
-                    CourseTitle = e.Course.title,      
+                    CourseTitle = e.Course.title,
 
                     TeacherID = e.teacherID,
-                    TeacherName = e.Teacher.name,  
+                    TeacherName = e.Teacher.name,
 
                     SessionID = e.sessionID,
-                    SessionName = e.Session.name       
+                    SessionName = e.Session.name
                 })
                 .ToList();
 
             if (!enrollments.Any())
-            {
                 return NotFound();
-            }
 
             return Ok(enrollments);
         }
@@ -57,29 +63,48 @@ namespace FYP.Controllers.Student
         }
 
 
-
         [HttpPost]
         [Route("SubmitStudentEvaluation")]
         public IHttpActionResult SubmitStudentEvaluation(
-    [FromBody] List<StudentEvaluation> evaluations)
+            [FromBody] List<StudentEvaluation> evaluations)
         {
             if (evaluations == null || !evaluations.Any())
                 return BadRequest("Invalid submission");
 
-            foreach (var e in evaluations)
+            try
             {
-                db.StudentEvaluation.Add(new StudentEvaluation
+                // ✅ Get latest session from DB
+                var latestSession = db.Session
+                    .OrderByDescending(s => s.id)
+                    .FirstOrDefault();
+
+                if (latestSession == null)
+                    return BadRequest("No active session found");
+
+                foreach (var e in evaluations)
                 {
-                    enrollmentID = e.enrollmentID,
-                    questionID = e.questionID,
-                    score = e.score,
-                    StudentId = e.StudentId
+                    db.StudentEvaluation.Add(new StudentEvaluation
+                    {
+                        enrollmentID = e.enrollmentID,
+                        questionID = e.questionID,
+                        score = e.score,
+                        StudentId = e.StudentId,
+                        SessionID = latestSession.id   // ✅ FIXED HERE
+                    });
+                }
+
+                db.SaveChanges();
+
+                return Ok(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new
+                {
+                    success = false,
+                    error = ex.Message
                 });
             }
-
-            db.SaveChanges();
-
-            return Ok(new { success = true });
         }
 
 
@@ -89,8 +114,18 @@ namespace FYP.Controllers.Student
         [Route("GetSubmittedStudentEvaluations/{studentId}")]
         public IHttpActionResult GetSubmittedStudentEvaluations(string studentId)
         {
+            var latestSession = db.Session
+                .OrderByDescending(s => s.id)
+                .FirstOrDefault();
+
+            if (latestSession == null)
+                return Ok(new List<int>());
+
             var submitted = db.StudentEvaluation
-                .Where(se => se.StudentId.Trim().ToLower() == studentId.Trim().ToLower())
+                .Where(se =>
+                    se.StudentId.Trim().ToLower() == studentId.Trim().ToLower()
+                    && se.SessionID == latestSession.id   // ✅ FILTER BY SESSION
+                )
                 .Select(se => se.enrollmentID)
                 .Distinct()
                 .ToList();
