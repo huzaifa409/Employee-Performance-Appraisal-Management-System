@@ -1,7 +1,9 @@
-﻿using System;
+﻿using FYP.Models;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
-using FYP.Models;
+using FYP.Models.DTO;
 
 namespace FYP.Controllers.DIRECTOR
 {
@@ -82,13 +84,23 @@ namespace FYP.Controllers.DIRECTOR
                         .Select(t => t.department)
                         .FirstOrDefault(),
 
-                    AvgScore = db.PeerEvaluation
+                    // ✅ Peer Evaluation Avg
+                    PeerAvg = db.PeerEvaluation
                         .Where(p =>
                             p.evaluateeID == g.Key.teacherID &&
                             p.courseCode == g.Key.courseCode &&
                             p.SessionID == sessionId
                         )
-                        .Average(p => (int?)p.score) ?? 0
+                        .Average(p => (int?)p.score),
+
+                    // ✅ Student Evaluation Avg (FIXED JOIN)
+                    StudentAvg = db.StudentEvaluation
+                        .Where(s =>
+                            s.SessionID == sessionId &&
+                            s.Enrollment.teacherID == g.Key.teacherID &&
+                            s.Enrollment.courseCode == g.Key.courseCode
+                        )
+                        .Average(s => (int?)s.score)
                 })
                 .ToList();
 
@@ -98,16 +110,148 @@ namespace FYP.Controllers.DIRECTOR
                 data = data.Where(d => d.Department == department).ToList();
             }
 
-            var result = data.Select(x => new
+            // ✅ FINAL RESULT WITH COMBINED AVERAGE
+            var result = data.Select(x =>
             {
-                x.TeacherID,
-                x.TeacherName,
-                x.CourseCode,
-                x.Department,
-                Percentage = (x.AvgScore / 4.0) * 100
+                var peer = x.PeerAvg ?? 0;
+                var student = x.StudentAvg ?? 0;
+
+                int count = 0;
+                if (x.PeerAvg != null) count++;
+                if (x.StudentAvg != null) count++;
+
+                var finalAvg = count > 0 ? (peer + student) / count : 0;
+
+                return new
+                {
+                    x.TeacherID,
+                    x.TeacherName,
+                    x.CourseCode,
+                    x.Department,
+                    Percentage = (finalAvg / 4.0) * 100
+                };
             });
 
             return Ok(result);
+        }
+
+        [HttpGet]
+        [Route("GetAllCourses")]
+        public IHttpActionResult GetAllCourses()
+        {
+            var courses = db.Course
+                .Select(c => c.code)
+                .Distinct()
+                .ToList();
+
+            return Ok(courses);
+        }
+
+
+
+
+        [HttpGet]
+        [Route("GetTeachersByCourse")]
+        public IHttpActionResult GetTeachersByCourse(string courseCode)
+        {
+            if (string.IsNullOrEmpty(courseCode))
+                return Ok(new List<object>());
+
+            courseCode = courseCode.Trim().ToUpper(); // normalize
+
+            // Get latest session ID for this course
+            var latestSessionId = db.Enrollment
+                .Where(e => e.courseCode.ToUpper().Trim() == courseCode)
+                .OrderByDescending(e => e.sessionID)
+                .Select(e => e.sessionID)
+                .FirstOrDefault();
+
+            var teachers = db.Enrollment
+                .Where(e => e.courseCode.ToUpper().Trim() == courseCode && e.sessionID == latestSessionId)
+                .Select(e => new
+                {
+                    id = e.teacherID,
+                    name = db.Teacher
+                                .Where(t => t.userID == e.teacherID)
+                                .Select(t => t.name)
+                                .FirstOrDefault()
+                })
+                .Distinct()
+                .ToList();
+
+            return Ok(teachers);
+        }
+
+
+
+        [HttpGet]
+        [Route("GetAllTeachers")]
+        public IHttpActionResult GetAllTeachers()
+        {
+            var teachers = db.Enrollment
+                .Select(e => new
+                {
+                    id = e.teacherID,
+                    name = db.Teacher
+                                .Where(t => t.userID == e.teacherID)
+                                .Select(t => t.name)
+                                .FirstOrDefault()
+                })
+                .Distinct()
+                .ToList();
+
+            return Ok(teachers);
+        }
+
+
+        [HttpPost]
+        [Route("CompareTeachers")]
+        public IHttpActionResult CompareTeachers(CompareDTO dto)
+        {
+            var result = new List<object>();
+
+            if (dto.mode == "course")
+            {
+                result.Add(GetTeacherScore(dto.teacherA, dto.courseCode, null));
+                result.Add(GetTeacherScore(dto.teacherB, dto.courseCode, null));
+            }
+            else
+            {
+                result.Add(GetTeacherScore(dto.teacherA, null, dto.session1));
+                result.Add(GetTeacherScore(dto.teacherA, null, dto.session2));
+            }
+
+            return Ok(result);
+        }
+
+        private object GetTeacherScore(string teacherId, string courseCode, int? sessionId)
+        {
+            var peer = db.PeerEvaluation
+                .Where(p => p.evaluateeID == teacherId &&
+                       (courseCode == null || p.courseCode == courseCode) &&
+                       (sessionId == null || p.SessionID == sessionId))
+                .Average(p => (int?)p.score) ?? 0;
+
+            var student = db.StudentEvaluation
+                .Where(s =>
+                    (courseCode == null || s.Enrollment.courseCode == courseCode) &&
+                    (sessionId == null || s.SessionID == sessionId) &&
+                    s.Enrollment.teacherID == teacherId
+                )
+                .Average(s => (int?)s.score) ?? 0;
+
+            var finalScore = (peer + student) / 2.0;
+
+            var name = db.Teacher
+                .Where(t => t.userID == teacherId)
+                .Select(t => t.name)
+                .FirstOrDefault();
+
+            return new
+            {
+                Name = name,
+                Percentage = (finalScore / 4.0) * 100
+            };
         }
     }
     }

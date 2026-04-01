@@ -153,6 +153,7 @@
     </Compile>
     <Compile Include="Models\DTO\AddKpiDto.cs" />
     <Compile Include="Models\DTO\AddPeerEvaluatorDto.cs" />
+    <Compile Include="Models\DTO\CompareDTO.cs" />
     <Compile Include="Models\DTO\ConfidentialEvaluationDto.cs" />
     <Compile Include="Models\DTO\PerformanceDto.cs" />
     <Compile Include="Models\DTO\StudentEnrollementDto.cs" />
