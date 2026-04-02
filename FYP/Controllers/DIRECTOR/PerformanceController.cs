@@ -212,8 +212,15 @@ namespace FYP.Controllers.DIRECTOR
 
             if (dto.mode == "course")
             {
-                result.Add(GetTeacherScore(dto.teacherA, dto.courseCode, null));
-                result.Add(GetTeacherScore(dto.teacherB, dto.courseCode, null));
+                // ✅ Get latest session for this course
+                var latestSessionId = db.Enrollment
+                    .Where(e => e.courseCode == dto.courseCode)
+                    .OrderByDescending(e => e.sessionID)
+                    .Select(e => e.sessionID)
+                    .FirstOrDefault();
+
+                result.Add(GetTeacherScore(dto.teacherA, dto.courseCode, latestSessionId));
+                result.Add(GetTeacherScore(dto.teacherB, dto.courseCode, latestSessionId));
             }
             else
             {
@@ -228,17 +235,17 @@ namespace FYP.Controllers.DIRECTOR
         {
             var peer = db.PeerEvaluation
                 .Where(p => p.evaluateeID == teacherId &&
-                       (courseCode == null || p.courseCode == courseCode) &&
+                       (courseCode == null || p.courseCode.ToUpper().Trim() == courseCode.ToUpper().Trim()) &&
                        (sessionId == null || p.SessionID == sessionId))
-                .Average(p => (int?)p.score) ?? 0;
+                .Average(p => (double?)p.score) ?? 0;
 
             var student = db.StudentEvaluation
                 .Where(s =>
-                    (courseCode == null || s.Enrollment.courseCode == courseCode) &&
+                    (courseCode == null || s.Enrollment.courseCode.ToUpper().Trim() == courseCode.ToUpper().Trim()) &&
                     (sessionId == null || s.SessionID == sessionId) &&
                     s.Enrollment.teacherID == teacherId
                 )
-                .Average(s => (int?)s.score) ?? 0;
+                .Average(s => (double?)s.score) ?? 0;
 
             var finalScore = (peer + student) / 2.0;
 
@@ -250,7 +257,10 @@ namespace FYP.Controllers.DIRECTOR
             return new
             {
                 Name = name,
-                Percentage = (finalScore / 4.0) * 100
+                Peer = Math.Round(peer, 2),        // ✅ REQUIRED
+                Student = Math.Round(student, 2),  // ✅ REQUIRED
+                Final = Math.Round(finalScore, 2),
+                Percentage = Math.Round((finalScore / 4.0) * 100, 2)
             };
         }
     }
