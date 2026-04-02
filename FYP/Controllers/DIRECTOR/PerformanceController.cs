@@ -233,22 +233,41 @@ namespace FYP.Controllers.DIRECTOR
 
         private object GetTeacherScore(string teacherId, string courseCode, int? sessionId)
         {
-            var peer = db.PeerEvaluation
+            const double MAX_SCORE_PER_QUESTION = 4.0;  // Each question max points
+            const double SCALE_TO_TEN = 10.0;           // Average score scaled out of 10
+
+            // --- Peer Evaluation ---
+            var peerList = db.PeerEvaluation
                 .Where(p => p.evaluateeID == teacherId &&
                        (courseCode == null || p.courseCode.ToUpper().Trim() == courseCode.ToUpper().Trim()) &&
                        (sessionId == null || p.SessionID == sessionId))
-                .Average(p => (double?)p.score) ?? 0;
+                .ToList();
 
-            var student = db.StudentEvaluation
+            double peerTotalScore = peerList.Sum(p => (double)p.score);
+            double peerMaxTotal = peerList.Count * MAX_SCORE_PER_QUESTION;
+            double peerAverageOutOfTen = peerMaxTotal > 0 ? (peerTotalScore / peerMaxTotal) * SCALE_TO_TEN : 0;
+
+            // --- Student Evaluation ---
+            var studentList = db.StudentEvaluation
                 .Where(s =>
                     (courseCode == null || s.Enrollment.courseCode.ToUpper().Trim() == courseCode.ToUpper().Trim()) &&
                     (sessionId == null || s.SessionID == sessionId) &&
                     s.Enrollment.teacherID == teacherId
                 )
-                .Average(s => (double?)s.score) ?? 0;
+                .ToList();
 
-            var finalScore = (peer + student) / 2.0;
+            double studentTotalScore = studentList.Sum(s => (double)s.score);
+            double studentMaxTotal = studentList.Count * MAX_SCORE_PER_QUESTION;
+            double studentAverageOutOfTen = studentMaxTotal > 0 ? (studentTotalScore / studentMaxTotal) * SCALE_TO_TEN : 0;
 
+            // --- Overall Average Out of 100 ---
+            double overallAveragePercentage = 0;
+            double totalScore = peerTotalScore + studentTotalScore;
+            double totalMax = peerMaxTotal + studentMaxTotal;
+            if (totalMax > 0)
+                overallAveragePercentage = (totalScore / totalMax) * 100;
+
+            // --- Teacher Name ---
             var name = db.Teacher
                 .Where(t => t.userID == teacherId)
                 .Select(t => t.name)
@@ -257,10 +276,15 @@ namespace FYP.Controllers.DIRECTOR
             return new
             {
                 Name = name,
-                Peer = Math.Round(peer, 2),        // ✅ REQUIRED
-                Student = Math.Round(student, 2),  // ✅ REQUIRED
-                Final = Math.Round(finalScore, 2),
-                Percentage = Math.Round((finalScore / 4.0) * 100, 2)
+                PeerAverageOutOfTen = Math.Round(peerAverageOutOfTen, 2),
+                StudentAverageOutOfTen = Math.Round(studentAverageOutOfTen, 2),
+                OverallAverageOutOfHundred = Math.Round(overallAveragePercentage, 2),
+                PeerTotalScore = Math.Round(peerTotalScore, 2),
+                PeerMaxTotal = peerMaxTotal,
+                StudentTotalScore = Math.Round(studentTotalScore, 2),
+                StudentMaxTotal = studentMaxTotal,
+                TotalScore = Math.Round(totalScore, 2),
+                TotalMax = totalMax
             };
         }
     }
