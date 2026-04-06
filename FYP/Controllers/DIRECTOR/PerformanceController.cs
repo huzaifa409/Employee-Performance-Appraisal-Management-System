@@ -284,7 +284,7 @@ namespace FYP.Controllers.DIRECTOR
                 StudentTotalScore = Math.Round(studentTotalScore, 2),
                 StudentMaxTotal = studentMaxTotal,
                 TotalScore = Math.Round(totalScore, 2),
-                TotalMax = totalMax
+                TotalMax = totalMax,
             };
         }
     }
