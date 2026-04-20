@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
+using System.Web.Http.Cors;
 
 namespace FYP
 {
@@ -14,6 +15,10 @@ namespace FYP
             // Web API routes
             config.MapHttpAttributeRoutes();
             //config.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Always;
+
+
+            var cors = new EnableCorsAttribute("*", "*", "*");
+            config.EnableCors(cors);
 
 
             config.Routes.MapHttpRoute(

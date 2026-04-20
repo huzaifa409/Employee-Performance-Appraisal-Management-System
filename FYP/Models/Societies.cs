@@ -12,28 +12,18 @@ namespace FYP.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class Users
+    public partial class Societies
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Users()
+        public Societies()
         {
-            this.KPIScore = new HashSet<KPIScore>();
-            this.KPIScore1 = new HashSet<KPIScore>();
             this.SocietyAssignments = new HashSet<SocietyAssignments>();
         }
     
-        public string id { get; set; }
-        public string password { get; set; }
-        public string role { get; set; }
-        public string profileImagePath { get; set; }
-        public Nullable<int> isActive { get; set; }
+        public int SocietyId { get; set; }
+        public string SocietyName { get; set; }
+        public string Description { get; set; }
     
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<KPIScore> KPIScore { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<KPIScore> KPIScore1 { get; set; }
-        public virtual Student Student { get; set; }
-        public virtual Teacher Teacher { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<SocietyAssignments> SocietyAssignments { get; set; }
     }

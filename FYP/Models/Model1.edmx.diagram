@@ -60,6 +60,11 @@
         <AssociationConnector Association="FYPModel.FK__EmployeSe__Emplo__0697FACD" />
         <AssociationConnector Association="FYPModel.FK_SessionID" />
         <AssociationConnector Association="FYPModel.FKSessionID" />
+        <EntityTypeShape EntityType="FYPModel.Societies" Width="1.5" PointX="5.5" PointY="19.875" />
+        <EntityTypeShape EntityType="FYPModel.SocietyAssignments" Width="1.5" PointX="7.75" PointY="12.375" />
+        <AssociationConnector Association="FYPModel.FK__SocietyAs__Sessi__336AA144" />
+        <AssociationConnector Association="FYPModel.FK__SocietyAs__Socie__32767D0B" />
+        <AssociationConnector Association="FYPModel.FK__SocietyAs__Teach__345EC57D" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
