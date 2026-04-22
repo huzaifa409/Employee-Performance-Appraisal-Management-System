@@ -310,39 +310,6 @@ namespace FYP.Controllers.HOD
         
 
 
-        // =========================
-        // GET SOCIETY SUMMARY BY SESSION
-        // =========================
-        //[HttpGet]
-        //[Route("GetSocietySummary/{sessionId}")]
-        //public IHttpActionResult GetSocietySummary(int sessionId)
-        //{
-        //    var data = db.Societies
-        //        .Select(s => new
-        //        {
-        //            s.SocietyId,
-        //            s.SocietyName,
-
-        //            ChairCount = db.SocietyAssignments
-        //                .Count(a => a.SocietyId == s.SocietyId
-        //                         && a.SessionId == sessionId
-        //                         && a.IsChairperson == true),
-
-        //            MentorCount = db.SocietyAssignments
-        //                .Count(a => a.SocietyId == s.SocietyId
-        //                         && a.SessionId == sessionId
-        //                         && a.IsMentor == true),
-
-        //            Chairpersons = (from a in db.SocietyAssignments
-        //                            join t in db.Teacher on a.TeacherId equals t.userID
-        //                            where a.SocietyId == s.SocietyId
-        //                               && a.SessionId == sessionId
-        //                               && a.IsChairperson == true
-        //                            select t.name).ToList()
-        //        })
-        //        .ToList();
-
-        //    return Ok(data);
-        //}
+      
     }
 }
