@@ -1,5 +1,6 @@
 ﻿using FYP.Models;
 using FYP.Models.DTO;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -170,27 +171,7 @@ namespace FYP.Controllers.Student
                     .Where(q => questionIds.Contains(q.QuestionID))
                     .ToList();
 
-                // 🔹 Build Email Body
-
-                //string body = "";
-                //body += "CONFIDENTIAL EVALUATION\n\n";
-                //body += "Student: " + student?.name + "\n";
-                //body += "Teacher: " + teacher?.name + "\n";
-                //body += "Course: " + course?.title + "\n";
-                //body += "Date: " + DateTime.Now + "\n\n";
-                //body += "-----------------------------\n";
-                //body += "Questions & Answers\n";
-                //body += "-----------------------------\n\n";
-
-                //foreach (var ans in model.Answers)
-                //{
-                //    var question = questions
-                //        .FirstOrDefault(q => q.QuestionID == ans.questionId);
-
-                //    body += "Q: " + question?.QuestionText + "\n";
-                //    body += "Score: " + ans.score + "\n\n";
-                //}
-
+            
                 var emailObject = new
                 {
                     studentId = model.StudentId,
@@ -212,7 +193,11 @@ namespace FYP.Controllers.Student
                     }).ToList()
                 };
 
-                string body = Newtonsoft.Json.JsonConvert.SerializeObject(emailObject, Newtonsoft.Json.Formatting.Indented);
+                //string body = Newtonsoft.Json.JsonConvert.SerializeObject(emailObject, Newtonsoft.Json.Formatting.Indented);
+
+                string body = "START_EVAL\n" +
+              JsonConvert.SerializeObject(emailObject, Formatting.Indented) +
+              "\nEND_EVAL";
 
 
 

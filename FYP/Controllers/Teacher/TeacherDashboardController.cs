@@ -165,20 +165,91 @@ namespace FYP.Controllers.Teacher
 
 
 
+        //[HttpGet]
+        //[Route("GetPeerEvaluatorID")]
+        //public IHttpActionResult GetPeerEvaluatorID(string userId)
+        //{
+        //    try
+        //    {
+        //        // Get the PeerEvaluator entry for this teacher (you may also filter by current session)
+        //        var peerEvaluator = db.PeerEvaluator
+        //            .FirstOrDefault(pe => pe.teacherID.Trim().ToLower() == userId.Trim().ToLower());
+
+        //        if (peerEvaluator == null)
+        //            return Ok(new { peerEvaluatorID = (int?)null });
+
+        //        return Ok(new { peerEvaluatorID = peerEvaluator.id });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return InternalServerError(ex);
+        //    }
+        //}
+
+
         [HttpGet]
         [Route("GetPeerEvaluatorID")]
         public IHttpActionResult GetPeerEvaluatorID(string userId)
         {
             try
             {
-                // Get the PeerEvaluator entry for this teacher (you may also filter by current session)
+                if (string.IsNullOrWhiteSpace(userId))
+                    return BadRequest("UserId is required");
+
+                string normalizedUserId = userId.Trim().ToLower();
+
+                var teacher = db.Teacher
+                    .FirstOrDefault(t => t.userID.Trim().ToLower() == normalizedUserId);
+
+                if (teacher == null)
+                    return Ok(new { peerEvaluatorID = (int?)null, isAllowed = false });
+
+                var latestSession = db.Session
+                    .OrderByDescending(s => s.id)
+                    .FirstOrDefault();
+
+                if (latestSession == null)
+                    return Ok(new { peerEvaluatorID = (int?)null, isAllowed = false });
+
+                bool isPermanent = teacher.isPermanentEvaluator == 1;
+
+                // STEP 1: check existing evaluator in latest session
                 var peerEvaluator = db.PeerEvaluator
-                    .FirstOrDefault(pe => pe.teacherID.Trim().ToLower() == userId.Trim().ToLower());
+                    .FirstOrDefault(pe =>
+                        pe.teacherID.Trim().ToLower() == normalizedUserId &&
+                        pe.sessionID == latestSession.id
+                    );
 
-                if (peerEvaluator == null)
-                    return Ok(new { peerEvaluatorID = (int?)null });
+                // STEP 2: AUTO INSERT ONLY ONCE (FIXED)
+                if (isPermanent && peerEvaluator == null)
+                {
+                    peerEvaluator = new PeerEvaluator
+                    {
+                        teacherID = normalizedUserId,
+                        sessionID = latestSession.id
+                    };
 
-                return Ok(new { peerEvaluatorID = peerEvaluator.id });
+                    db.PeerEvaluator.Add(peerEvaluator);
+                    db.SaveChanges(); // save immediately so ID is generated
+                }
+
+                // STEP 3: response
+                if (peerEvaluator != null)
+                {
+                    return Ok(new
+                    {
+                        peerEvaluatorID = peerEvaluator.id,
+                        isAllowed = true,
+                        source = isPermanent ? "PermanentTeacherAutoAdded" : "SessionEvaluator"
+                    });
+                }
+
+                return Ok(new
+                {
+                    peerEvaluatorID = (int?)null,
+                    isAllowed = false,
+                    source = "NotEvaluator"
+                });
             }
             catch (Exception ex)
             {
@@ -189,8 +260,12 @@ namespace FYP.Controllers.Teacher
 
 
 
-
         int employeeTypeId;
+
+
+
+
+
 
         [Route("SeeOwnPerformance")]
         public IHttpActionResult GetTeacherPerformance(string userId, int sessionId)

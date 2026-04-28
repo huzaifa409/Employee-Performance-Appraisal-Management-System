@@ -31,8 +31,32 @@ namespace FYP.Controllers.HOD
                 return Ok(teachers);
             }
 
-            
-            [HttpGet]
+        [HttpGet]
+        [Route("GetNonPermenentTeachers")]
+        public IHttpActionResult GetNonPermenentTeachers()
+        {
+            try
+            {
+                var teachers = db.Teacher
+                    .Where(t => t.isPermanentEvaluator == 0) // 🔥 FILTER HERE
+                    .Select(t => new
+                    {
+                        t.userID,
+                        t.name,
+                        t.department
+                    })
+                    .ToList();
+
+                return Ok(teachers);
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+        }
+
+
+        [HttpGet]
             [Route("Sessions")]
             public IHttpActionResult GetSessions()
             {
@@ -80,6 +104,8 @@ namespace FYP.Controllers.HOD
             return Ok("Peer evaluators added successfully");
         }
 
+
+        ///  //// To Get Normal Evaluators by session
         [HttpGet]
         [Route("BySession/{sessionId}")]
         public IHttpActionResult GetPeerEvaluatorsBySession(int sessionId)
@@ -100,5 +126,103 @@ namespace FYP.Controllers.HOD
 
 
 
+        // 7. Toggle Permanent Status (Add or Remove from Permanent list)
+        // Isay Add aur Edit dono ke liye use kiya ja sakta hai
+        [HttpPost]
+        [Route("TogglePermanent")]
+        public IHttpActionResult TogglePermanentStatus(TogglePermanentDto model)
+        {
+            if (model == null || string.IsNullOrEmpty(model.UserID))
+                return BadRequest("Invalid user data.");
+
+            try
+            {
+                var teacher = db.Teacher.FirstOrDefault(t => t.userID == model.UserID);
+                if (teacher == null) return NotFound();
+
+                // Status update karein: 1 for Permanent, 0 for Normal
+                teacher.isPermanentEvaluator = model.IsPermanent ? 1 : 0;
+
+                // Agar kisi ko Permanent banaya hai, toh usey PeerEvaluator table (manual list) se hatayein
+                // Kyunke wo ab globally available hoga
+                if (model.IsPermanent)
+                {
+                    var manualAssignments = db.PeerEvaluator.Where(pe => pe.teacherID == model.UserID).ToList();
+                    if (manualAssignments.Any())
+                    {
+                        db.PeerEvaluator.RemoveRange(manualAssignments);
+                    }
+                }
+
+                db.SaveChanges();
+
+                string status = model.IsPermanent ? "Permanent" : "Normal";
+                return Ok(new { message = $"Teacher marked as {status} evaluator successfully." });
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+        }
+
+        // 8. Bulk Permanent Assignment (Extra: Multiple teachers ke liye)
+
+        [HttpPost]
+        [Route("SetBulkPermanent")]
+        public IHttpActionResult SetBulkPermanent(BulkPermanentDto model)
+        {
+            if (model == null || model.UserIDs == null || !model.UserIDs.Any())
+                return BadRequest("No User IDs provided.");
+
+            try
+            {
+                var teachers = db.Teacher.Where(t => model.UserIDs.Contains(t.userID)).ToList();
+
+                foreach (var t in teachers)
+                {
+                    t.isPermanentEvaluator = 1;
+                }
+
+                db.SaveChanges();
+
+                return Ok(new { message = "Selected teachers are now Permanent Evaluators." });
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+        }
+
+
+
+        [HttpGet]
+        [Route("PermanentEvaluators")]
+        public IHttpActionResult GetPermanentEvaluators()
+        {
+            try
+            {
+                var permanentEvaluators = db.Teacher
+                    .Where(t => t.isPermanentEvaluator == 1)
+                    .Select(t => new
+                    {
+                        userID = t.userID,
+                        name = t.name,
+                        department = t.department,
+                        designation = t.designation,
+                        isPermanentEvaluator = t.isPermanentEvaluator
+                    })
+                    .ToList();
+
+                return Ok(permanentEvaluators);
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+        }
     }
+
+
+
+
 }

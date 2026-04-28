@@ -18,6 +18,7 @@ namespace FYP.Models
         public Societies()
         {
             this.SocietyAssignments = new HashSet<SocietyAssignments>();
+            this.SocietyEvaluation = new HashSet<SocietyEvaluation>();
         }
     
         public int SocietyId { get; set; }
@@ -26,5 +27,7 @@ namespace FYP.Models
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<SocietyAssignments> SocietyAssignments { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<SocietyEvaluation> SocietyEvaluation { get; set; }
     }
 }

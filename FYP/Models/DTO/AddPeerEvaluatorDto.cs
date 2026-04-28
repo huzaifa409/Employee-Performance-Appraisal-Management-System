@@ -12,4 +12,6 @@ namespace FYP.Models.DTO
             public List<string> TeacherIds { get; set; }
         
     }
+
+  
 }

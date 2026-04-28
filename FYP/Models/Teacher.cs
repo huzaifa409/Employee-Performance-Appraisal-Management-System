@@ -21,11 +21,15 @@ namespace FYP.Models
             this.Enrollment = new HashSet<Enrollment>();
             this.PeerEvaluation = new HashSet<PeerEvaluation>();
             this.PeerEvaluator = new HashSet<PeerEvaluator>();
+            this.SocietyEvaluation = new HashSet<SocietyEvaluation>();
+            this.SocietyEvaluation1 = new HashSet<SocietyEvaluation>();
         }
     
         public string userID { get; set; }
         public string name { get; set; }
         public string department { get; set; }
+        public Nullable<int> isPermanentEvaluator { get; set; }
+        public string designation { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<CourseAllocation> CourseAllocation { get; set; }
@@ -36,5 +40,9 @@ namespace FYP.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<PeerEvaluator> PeerEvaluator { get; set; }
         public virtual Users Users { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<SocietyEvaluation> SocietyEvaluation { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<SocietyEvaluation> SocietyEvaluation1 { get; set; }
     }
 }

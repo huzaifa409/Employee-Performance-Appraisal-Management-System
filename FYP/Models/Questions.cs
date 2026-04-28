@@ -19,6 +19,7 @@ namespace FYP.Models
         {
             this.PeerEvaluation = new HashSet<PeerEvaluation>();
             this.StudentEvaluation = new HashSet<StudentEvaluation>();
+            this.SocietyEvaluation = new HashSet<SocietyEvaluation>();
         }
     
         public int QuestionID { get; set; }
@@ -30,5 +31,7 @@ namespace FYP.Models
         public virtual ICollection<PeerEvaluation> PeerEvaluation { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<StudentEvaluation> StudentEvaluation { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<SocietyEvaluation> SocietyEvaluation { get; set; }
     }
 }
