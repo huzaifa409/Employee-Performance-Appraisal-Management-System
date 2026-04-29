@@ -49,30 +49,109 @@ namespace FYP.Controllers.Teacher
         }
 
 
-        // GET: api/TeacherDashboard/GetTeachersWithCourses
+
+
+
+
+
+        private int GetDesignationRank(string designation)
+        {
+            if (string.IsNullOrWhiteSpace(designation))
+                return 0;
+
+            switch (designation.Trim().ToLower())
+            {
+                case "hod": return 5;                  // 🔥 highest
+                case "professor": return 4;
+                case "assistant professor": return 3;
+                case "teacher": return 2;
+                case "junior teacher": return 1;
+                default: return 0;
+            }
+        }
+
+
+
         [HttpGet]
         [Route("GetTeachersWithCourses")]
-        public IHttpActionResult GetTeachersWithCourses()
+        public IHttpActionResult GetTeachersWithCourses(string userId)
         {
-            var data = db.Enrollment
-                .GroupBy(e => e.teacherID)
-                .Select(g => new
-                {
-                    TeacherID = g.Key,
-                    TeacherName = db.Teacher
-                        .Where(t => t.userID == g.Key)
-                        .Select(t => t.name)
-                        .FirstOrDefault(),
+            try
+            {
+                if (string.IsNullOrWhiteSpace(userId))
+                    return BadRequest("UserId is required");
 
-                    Courses = g
-                        .Select(x => x.courseCode)
-                        .Distinct()
-                        .ToList()
-                })
-                .ToList();
+                string normalizedUserId = userId.Trim().ToLower();
 
-            return Ok(data);
+                // 🔹 Current Teacher
+                var currentTeacher = db.Teacher
+                    .FirstOrDefault(t => t.userID.Trim().ToLower() == normalizedUserId);
+
+                if (currentTeacher == null)
+                    return Ok(new List<object>());
+
+                int currentRank = GetDesignationRank(currentTeacher.designation);
+
+                var data = db.Enrollment
+                    .GroupBy(e => e.teacherID)
+                    .Select(g => new
+                    {
+                        TeacherID = g.Key,
+                        TeacherInfo = db.Teacher
+                            .Where(t => t.userID == g.Key)
+                            .Select(t => new
+                            {
+                                t.name,
+                                t.designation
+                            })
+                            .FirstOrDefault(),
+
+                        Courses = g
+                            .Select(x => x.courseCode)
+                            .Distinct()
+                            .ToList()
+                    })
+                    .ToList()
+
+                    // 🔥 FILTER LOGIC
+                    .Where(t =>
+                    {
+                        if (t.TeacherInfo == null)
+                            return false;
+
+                        int targetRank = GetDesignationRank(t.TeacherInfo.designation);
+
+                        // ❌ no self evaluation
+                        if (t.TeacherID.Trim().ToLower() == normalizedUserId)
+                            return false;
+
+                        // 🔥 RULE: same level + lower
+                        return targetRank <= currentRank;
+                    })
+
+                    .Select(t => new
+                    {
+                        TeacherID = t.TeacherID,
+                        TeacherName = t.TeacherInfo.name,
+                        Courses = t.Courses
+                    })
+                    .ToList();
+
+                return Ok(data);
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
         }
+
+
+
+
+
+
+
+
 
 
         [HttpGet]

@@ -9,6 +9,7 @@ using FYP.Models.DTO;
 
 namespace FYP.Controllers.HOD
 {
+    [RoutePrefix("api/SocietyEvaluation")]
     public class SocietyEvaluationController : ApiController
     {
 
@@ -17,41 +18,103 @@ namespace FYP.Controllers.HOD
         [Route("Submit")]
         public IHttpActionResult SubmitSocietyEvaluation([FromBody] List<SocietyEvaluationDTO> evaluations)
         {
-            if (evaluations == null || !evaluations.Any())
-                return BadRequest("Invalid submission");
+            if (evaluations == null || evaluations.Count == 0)
+                return BadRequest("No evaluation data received");
 
             try
             {
-                var latestSession = db.Session
-                    .OrderByDescending(s => s.id)
-                    .FirstOrDefault();
-
-                if (latestSession == null)
-                    return BadRequest("No active session");
-
                 foreach (var e in evaluations)
                 {
-                    // 🔒 Prevent duplicate (VERY IMPORTANT)
+                    // ---------------- NORMALIZE INPUT ----------------
+                    var evaluatorId = e.EvaluatorId?.Trim();
+                    var evaluateeId = e.EvaluateeId?.Trim();
+                    var evaluationType = e.EvaluationType?.Trim();
+
+                    // ================= DEBUG (REMOVE LATER IF YOU WANT) =================
+                    // This helps you SEE EXACT VALUES coming from frontend
+                    var debugInfo = new
+                    {
+                        evaluatorRaw = e.EvaluatorId,
+                        evaluateeRaw = e.EvaluateeId,
+                        evaluatorClean = evaluatorId,
+                        evaluateeClean = evaluateeId,
+                        sessionId = e.SessionId,
+                        societyId = e.SocietyId,
+                        questionId = e.QuestionId
+                    };
+
+                    // ---------------- VALIDATION ----------------
+
+                    var teacherExists =
+                        db.Teacher.Any(t => t.userID == evaluatorId)
+                        &&
+                        db.Teacher.Any(t => t.userID == evaluateeId);
+
+                    if (!teacherExists)
+                    {
+                        return Ok(new
+                        {
+                            success = false,
+                            error = "Invalid Teacher ID(s)",
+                            debug = debugInfo
+                        });
+                    }
+
+                    var sessionExists = db.Session.Any(s => s.id == e.SessionId);
+                    if (!sessionExists)
+                    {
+                        return Ok(new
+                        {
+                            success = false,
+                            error = "Invalid SessionId",
+                            debug = debugInfo
+                        });
+                    }
+
+                    var societyExists = db.Societies.Any(s => s.SocietyId == e.SocietyId);
+                    if (!societyExists)
+                    {
+                        return Ok(new
+                        {
+                            success = false,
+                            error = "Invalid SocietyId",
+                            debug = debugInfo
+                        });
+                    }
+
+                    var questionExists = db.Questions.Any(q => q.QuestionID == e.QuestionId);
+                    if (!questionExists)
+                    {
+                        return Ok(new
+                        {
+                            success = false,
+                            error = "Invalid QuestionId",
+                            debug = debugInfo
+                        });
+                    }
+
+                    // ---------------- DUPLICATE CHECK ----------------
+
                     var exists = db.SocietyEvaluation.Any(x =>
-                        x.EvaluatorId == e.EvaluatorId &&
-                        x.EvaluateeId == e.EvaluateeId &&
+                        x.EvaluatorId == evaluatorId &&
+                        x.EvaluateeId == evaluateeId &&
                         x.SocietyId == e.SocietyId &&
                         x.QuestionId == e.QuestionId &&
-                        x.SessionId == latestSession.id &&
-                        x.EvaluationType.Trim().ToLower() == e.EvaluationType.Trim().ToLower()
+                        x.SessionId == e.SessionId &&
+                        x.EvaluationType == evaluationType
                     );
 
                     if (!exists)
                     {
                         db.SocietyEvaluation.Add(new SocietyEvaluation
                         {
-                            EvaluatorId = e.EvaluatorId,
-                            EvaluateeId = e.EvaluateeId,
+                            EvaluatorId = evaluatorId,
+                            EvaluateeId = evaluateeId,
                             SocietyId = e.SocietyId,
                             QuestionId = e.QuestionId,
                             Score = e.Score,
-                            SessionId = latestSession.id,
-                            EvaluationType = e.EvaluationType
+                            SessionId = e.SessionId,
+                            EvaluationType = evaluationType
                         });
                     }
                 }
@@ -62,10 +125,14 @@ namespace FYP.Controllers.HOD
             }
             catch (Exception ex)
             {
-                return Ok(new { success = false, error = ex.Message });
+                return Ok(new
+                {
+                    success = false,
+                    error = ex.Message,
+                    inner = ex.InnerException?.InnerException?.Message
+                });
             }
         }
-
         [HttpGet]
         [Route("GetSubmitted/{evaluatorId}/{evaluationType}/{sessionId}")]
         public IHttpActionResult GetSubmittedEvaluations(string evaluatorId, string evaluationType, int sessionId)
