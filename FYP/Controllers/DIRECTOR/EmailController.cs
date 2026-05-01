@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 
+
 namespace FYP.Controllers.DIRECTOR
 {
         [RoutePrefix("api/email")]
@@ -21,8 +22,14 @@ namespace FYP.Controllers.DIRECTOR
         public IHttpActionResult GetAllEmails()
         {
             var emails = db.Email
-                           .OrderByDescending(x => x.id)
-                           .ToList();
+                .Select(x => new
+                {
+                    x.id,
+                    x.mail,
+                    x.isActive
+                })
+                .OrderByDescending(x => x.id)
+                .ToList();
 
             return Ok(emails);
         }
@@ -50,17 +57,16 @@ namespace FYP.Controllers.DIRECTOR
         [Route("add")]
         public IHttpActionResult AddEmail(Email model)
         {
-            if (model == null || string.IsNullOrEmpty(model.mail))
-                return BadRequest("Email is required.");
+            if (model == null || string.IsNullOrEmpty(model.mail) || string.IsNullOrEmpty(model.password))
+                return BadRequest("Email and App Password are required.");
 
-            model.isActive = false; // Always add as inactive
+            model.isActive = false;
 
             db.Email.Add(model);
             db.SaveChanges();
 
             return Ok(model);
         }
-
         // ============================================
         // 4️⃣ DELETE EMAIL
         // ============================================
