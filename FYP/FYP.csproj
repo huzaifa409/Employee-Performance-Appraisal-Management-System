@@ -158,6 +158,7 @@
     <Compile Include="Controllers\DATACELL\Student\StudentEvaluationController.cs" />
     <Compile Include="Controllers\DATACELL\Teacher\TeacherController.cs" />
     <Compile Include="Controllers\DIRECTOR\EmailController.cs" />
+    <Compile Include="Controllers\DIRECTOR\OverallPerformanceController.cs" />
     <Compile Include="Controllers\DIRECTOR\ReaderController.cs" />
     <Compile Include="Controllers\DIRECTOR\PerformanceController.cs" />
     <Compile Include="Controllers\DIRECTOR\QuestionaireController.cs" />
