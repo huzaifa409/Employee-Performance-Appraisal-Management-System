@@ -20,6 +20,7 @@ namespace FYP.Models
             this.CourseAllocation = new HashSet<CourseAllocation>();
             this.Enrollment = new HashSet<Enrollment>();
             this.PeerEvaluation = new HashSet<PeerEvaluation>();
+            this.CHR = new HashSet<CHR>();
         }
     
         public string code { get; set; }
@@ -31,5 +32,7 @@ namespace FYP.Models
         public virtual ICollection<Enrollment> Enrollment { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<PeerEvaluation> PeerEvaluation { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<CHR> CHR { get; set; }
     }
 }

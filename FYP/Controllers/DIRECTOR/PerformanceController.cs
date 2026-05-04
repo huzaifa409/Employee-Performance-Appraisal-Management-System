@@ -56,84 +56,84 @@ namespace FYP.Controllers.DIRECTOR
             return Ok(courses);
         }
 
-        [HttpGet]
-        [Route("GetTeacherPerformance")]
-        public IHttpActionResult GetTeacherPerformance(int sessionId, string department = null, string courseCode = null)
-        {
-            var query = db.Enrollment.Where(e => e.sessionID == sessionId);
+        //[HttpGet]
+        //[Route("GetTeacherPerformance")]
+        //public IHttpActionResult GetTeacherPerformance(int sessionId, string department = null, string courseCode = null)
+        //{
+        //    var query = db.Enrollment.Where(e => e.sessionID == sessionId);
 
-            if (!string.IsNullOrEmpty(courseCode) && courseCode != "All")
-            {
-                query = query.Where(e => e.courseCode == courseCode);
-            }
+        //    if (!string.IsNullOrEmpty(courseCode) && courseCode != "All")
+        //    {
+        //        query = query.Where(e => e.courseCode == courseCode);
+        //    }
 
-            var data = query
-                .GroupBy(e => new { e.teacherID, e.courseCode })
-                .Select(g => new
-                {
-                    TeacherID = g.Key.teacherID,
-                    CourseCode = g.Key.courseCode,
+        //    var data = query
+        //        .GroupBy(e => new { e.teacherID, e.courseCode })
+        //        .Select(g => new
+        //        {
+        //            TeacherID = g.Key.teacherID,
+        //            CourseCode = g.Key.courseCode,
 
-                    TeacherName = db.Teacher
-                        .Where(t => t.userID == g.Key.teacherID)
-                        .Select(t => t.name)
-                        .FirstOrDefault(),
+        //            TeacherName = db.Teacher
+        //                .Where(t => t.userID == g.Key.teacherID)
+        //                .Select(t => t.name)
+        //                .FirstOrDefault(),
 
-                    Department = db.Teacher
-                        .Where(t => t.userID == g.Key.teacherID)
-                        .Select(t => t.department)
-                        .FirstOrDefault(),
+        //            Department = db.Teacher
+        //                .Where(t => t.userID == g.Key.teacherID)
+        //                .Select(t => t.department)
+        //                .FirstOrDefault(),
 
-                    // ✅ Peer Evaluation Avg
-                    PeerAvg = db.PeerEvaluation
-                        .Where(p =>
-                            p.evaluateeID == g.Key.teacherID &&
-                            p.courseCode == g.Key.courseCode &&
-                            p.SessionID == sessionId
-                        )
-                        .Average(p => (int?)p.score),
+        //            // ✅ Peer Evaluation Avg
+        //            PeerAvg = db.PeerEvaluation
+        //                .Where(p =>
+        //                    p.evaluateeID == g.Key.teacherID &&
+        //                    p.courseCode == g.Key.courseCode &&
+        //                    p.SessionID == sessionId
+        //                )
+        //                .Average(p => (int?)p.score),
 
-                    // ✅ Student Evaluation Avg (FIXED JOIN)
-                    StudentAvg = db.StudentEvaluation
-                        .Where(s =>
-                            s.SessionID == sessionId &&
-                            s.Enrollment.teacherID == g.Key.teacherID &&
-                            s.Enrollment.courseCode == g.Key.courseCode
-                        )
-                        .Average(s => (int?)s.score)
-                })
-                .ToList();
+        //            // ✅ Student Evaluation Avg (FIXED JOIN)
+        //            StudentAvg = db.StudentEvaluation
+        //                .Where(s =>
+        //                    s.SessionID == sessionId &&
+        //                    s.Enrollment.teacherID == g.Key.teacherID &&
+        //                    s.Enrollment.courseCode == g.Key.courseCode
+        //                )
+        //                .Average(s => (int?)s.score)
+        //        })
+        //        .ToList();
 
-            // ✅ APPLY DEPARTMENT FILTER
-            if (!string.IsNullOrEmpty(department))
-            {
-                data = data.Where(d => d.Department == department).ToList();
-            }
+        //    // ✅ APPLY DEPARTMENT FILTER
+        //    if (!string.IsNullOrEmpty(department))
+        //    {
+        //        data = data.Where(d => d.Department == department).ToList();
+        //    }
 
-            // ✅ FINAL RESULT WITH COMBINED AVERAGE
-            var result = data.Select(x =>
-            {
-                var peer = x.PeerAvg ?? 0;
-                var student = x.StudentAvg ?? 0;
+        //    // ✅ FINAL RESULT WITH COMBINED AVERAGE
+        //    var result = data.Select(x =>
+        //    {
+        //        var peer = x.PeerAvg ?? 0;
+        //        var student = x.StudentAvg ?? 0;
 
-                int count = 0;
-                if (x.PeerAvg != null) count++;
-                if (x.StudentAvg != null) count++;
+        //        int count = 0;
+        //        if (x.PeerAvg != null) count++;
+        //        if (x.StudentAvg != null) count++;
 
-                var finalAvg = count > 0 ? (peer + student) / count : 0;
+        //        var finalAvg = count > 0 ? (peer + student) / count : 0;
 
-                return new
-                {
-                    x.TeacherID,
-                    x.TeacherName,
-                    x.CourseCode,
-                    x.Department,
-                    Percentage = (finalAvg / 4.0) * 100
-                };
-            });
+        //        return new
+        //        {
+        //            x.TeacherID,
+        //            x.TeacherName,
+        //            x.CourseCode,
+        //            x.Department,
+        //            Percentage = (finalAvg / 4.0) * 100
+        //        };
+        //    });
 
-            return Ok(result);
-        }
+        //    return Ok(result);
+        //}
 
         [HttpGet]
         [Route("GetAllCourses")]
@@ -291,7 +291,7 @@ namespace FYP.Controllers.DIRECTOR
 
 
 
-      
+
         ///              NEW
 
 
@@ -449,5 +449,100 @@ namespace FYP.Controllers.DIRECTOR
                 TotalMax = totalMax
             });
         }
+
+        ////////////////Academic
+
+
+
+        [HttpGet]
+        [Route("GetTeachersPerformanceList")]
+        public IHttpActionResult GetTeachersPerformanceList(int sessionId, string department = "All", string courseCode = "All")
+        {
+            var query = db.Enrollment.Where(e => e.sessionID == sessionId);
+
+            if (department != "All") query = query.Where(e => e.Teacher.department == department);
+            if (courseCode != "All") query = query.Where(e => e.courseCode == courseCode);
+
+            var teacherIds = query.Select(e => e.teacherID).Distinct().ToList();
+            var finalData = new List<object>();
+
+            foreach (var tid in teacherIds)
+            {
+                // Yahan aap apna CalculatePerformance logic call karein
+                // Isme ConfidentialEvaluation ka logic bhi add karein
+                var perf = CalculatePerformance(tid, sessionId);
+                finalData.Add(perf);
+            }
+            return Ok(finalData);
+        }
+
+        // Helper method (Taake code duplicate na ho)
+        private object CalculatePerformance(string teacherId, int sessionId)
+        {
+            const double MAX = 4.0;
+            const double SCALE = 10.0;
+
+            // 1. Student Evaluations
+            var studentList = db.StudentEvaluation
+                .Where(s => s.Enrollment.teacherID == teacherId && s.Enrollment.sessionID == sessionId)
+                .ToList();
+            double sTotal = studentList.Sum(s => (double)s.score);
+            double sMax = studentList.Count * MAX;
+            double sAvg = sMax > 0 ? (sTotal / sMax) * SCALE : 0;
+
+            // 2. Peer Evaluations
+            var peerList = db.PeerEvaluation
+                .Where(p => p.evaluateeID == teacherId && p.PeerEvaluator.sessionID == sessionId)
+                .ToList();
+            double pTotal = peerList.Sum(p => (double)p.score);
+            double pMax = peerList.Count * MAX;
+            double pAvg = pMax > 0 ? (pTotal / pMax) * SCALE : 0;
+
+            // ✅ 3. CHR — Enrollment se session verify
+            var isEnrolled = db.Enrollment
+                .Any(e => e.teacherID == teacherId && e.sessionID == sessionId);
+
+            // 3. CHR Average Score — Session filter ke saath
+            // Sirf us session ki CHR records consider hongi
+            var chrAvg = 0.0;
+
+            var chrRawData = db.CHR
+                .Where(c => c.TeacherID == teacherId && c.sessionID == sessionId)
+                .Select(x => new { LateIn = x.LateIn ?? 0, LeftEarly = x.LeftEarly ?? 0 })
+                .ToList();
+
+            chrAvg = chrRawData.Any()
+                ? chrRawData.Select(x => {
+                    int total = x.LateIn + x.LeftEarly;
+                    if (total >= 10) return 0.0;
+                    if (total >= 6) return 3.0;
+                    if (total >= 1) return 4.0;
+                    return 5.0;
+                }).Average()
+                : 0.0;
+
+            // CHR ko 10 scale pe convert karo (baaki scores ki tarah)
+            double chrPerc = Math.Round((chrAvg / 5.0) * SCALE, 2);
+
+            var teacher = db.Teacher.FirstOrDefault(t => t.userID == teacherId);
+
+            return new
+            {
+                TeacherID = teacherId,
+                Name = teacher?.name,
+                StudentAverage = Math.Round(sAvg, 2),
+                PeerAverage = Math.Round(pAvg, 2),
+                ChrAverage = chrPerc,           // ✅ CHR score 0-10 scale
+                ChrRawScore = Math.Round(chrAvg, 2), // ✅ Raw score 0-5 scale
+                CourseCode = db.Enrollment
+                    .Where(e => e.teacherID == teacherId && e.sessionID == sessionId)
+                    .Select(e => e.courseCode).FirstOrDefault()
+            };
+        }
+
+
+
+
+
     }
-    }
+}

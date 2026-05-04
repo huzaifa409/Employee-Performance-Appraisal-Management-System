@@ -47,5 +47,6 @@ namespace FYP.Models
         public virtual DbSet<Societies> Societies { get; set; }
         public virtual DbSet<SocietyAssignments> SocietyAssignments { get; set; }
         public virtual DbSet<SocietyEvaluation> SocietyEvaluation { get; set; }
+        public virtual DbSet<CHR> CHR { get; set; }
     }
 }
