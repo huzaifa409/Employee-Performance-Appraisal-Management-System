@@ -162,6 +162,7 @@
     <Compile Include="Controllers\DIRECTOR\ReaderController.cs" />
     <Compile Include="Controllers\DIRECTOR\PerformanceController.cs" />
     <Compile Include="Controllers\DIRECTOR\QuestionaireController.cs" />
+    <Compile Include="Controllers\Extra Features\ExtraFeaturesController.cs" />
     <Compile Include="Controllers\HOD\CourseManagementController.cs" />
     <Compile Include="Controllers\HOD\KPIController.cs" />
     <Compile Include="Controllers\HOD\PeerEvaluatorsController.cs" />
@@ -188,6 +189,7 @@
     <Compile Include="Models\DTO\CompareDTO.cs" />
     <Compile Include="Models\DTO\ConfidentialEvaluationDto.cs" />
     <Compile Include="Models\DTO\CourseManagementDto.cs" />
+    <Compile Include="Models\DTO\EmailRequest.cs" />
     <Compile Include="Models\DTO\PerformanceDto.cs" />
     <Compile Include="Models\DTO\SocietyDTO.cs" />
     <Compile Include="Models\DTO\SocietyAssignment.cs" />

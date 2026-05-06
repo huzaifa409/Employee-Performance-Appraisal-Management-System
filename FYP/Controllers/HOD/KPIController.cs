@@ -17,7 +17,6 @@ namespace FYP.Controllers.HOD
         FYPEntities db = new FYPEntities();
 
 
-             // 1. CREATE KPI WITH WEIGHTS
         [HttpPost]
         [Route("create-with-weight")]
         public IHttpActionResult CreateWithWeight(AddKPIDto dto)
@@ -164,9 +163,22 @@ namespace FYP.Controllers.HOD
                     int kpiId = (int)weightRec.KPIID;
                     int kpiTotalWeight = db.SessionKPIWeight.Where(w => w.KPIID == kpiId && w.SessionID == sid).Sum(x => x.Weight ?? 0);
 
-                    // 1. Remove from Mapping Table - IMPORTANT
+                    // --- NAYI LINES START (KPIScore delete karna zaroori hai) ---
+                    // 1. Pehle mapping record dhoondein
                     var mapRec = db.EmployeSessionKPI.FirstOrDefault(m => m.SubKPIID == subid && m.SessionID == sid);
-                    if (mapRec != null) db.EmployeSessionKPI.Remove(mapRec);
+                    if (mapRec != null)
+                    {
+                        // 2. KPIScore mein is mapping ID (empKPIID) ke saare records delete karein
+                        var relatedScores = db.KPIScore.Where(s => s.empKPIID == mapRec.id).ToList();
+                        if (relatedScores.Any()) db.KPIScore.RemoveRange(relatedScores);
+
+                        // 3. Phir mapping record ko delete karein
+                        db.EmployeSessionKPI.Remove(mapRec);
+                    }
+                    // --- NAYI LINES END ---
+                    // 1. Remove from Mapping Table - IMPORTANT
+                    //var mapRec = db.EmployeSessionKPI.FirstOrDefault(m => m.SubKPIID == subid && m.SessionID == sid);
+                    //if (mapRec != null) db.EmployeSessionKPI.Remove(mapRec);
 
                     // 2. Remove Weight and SubKPI definition
                     db.SessionKPIWeight.Remove(weightRec);
@@ -202,7 +214,7 @@ namespace FYP.Controllers.HOD
 
         // 4. DELETE MAIN KPI (Safe & Global 100%)
         [HttpDelete]
-        [Route("delete-main-kpi/{sid:int}/{kpiid:int}")] // Added explicit type constraints
+        [Route("delete-main-kpi/{sid}/{kpiid}")]
         public IHttpActionResult DeleteMainKpi(int sid, int kpiid)
         {
             try
@@ -210,26 +222,40 @@ namespace FYP.Controllers.HOD
                 using (var scope = new TransactionScope())
                 {
                     var kpi = db.KPI.Find(kpiid);
-                    if (kpi == null) return Content(HttpStatusCode.NotFound, "KPI not found in database.");
+                    if (kpi == null) return NotFound();
 
                     int empTypeId = kpi.KPI_Employeetype ?? 0;
 
-                    // 1. Remove from Mapping Table
+                    // --- NAYI LINES START (KPIScore delete karna zaroori hai) ---
+                    // 1. Is KPI ki saari mappings nikalain
                     var mappings = db.EmployeSessionKPI.Where(m => m.KPIID == kpiid && m.SessionID == sid).ToList();
-                    foreach (var m in mappings) db.EmployeSessionKPI.Remove(m);
+                    foreach (var m in mappings)
+                    {
+                        // 2. Har mapping ke scores delete karein
+                        var relatedScores = db.KPIScore.Where(s => s.empKPIID == m.id).ToList();
+                        if (relatedScores.Any()) db.KPIScore.RemoveRange(relatedScores);
+
+                        // 3. Mapping delete karein
+                        db.EmployeSessionKPI.Remove(m);
+                    }
+                    // --- NAYI LINES END ---
+
+                    // 1. Remove from Mapping Table (EmployeSessionKPI) - IMPORTANT
+                    //var mappings = db.EmployeSessionKPI.Where(m => m.KPIID == kpiid && m.SessionID == sid).ToList();
+                    //foreach (var m in mappings) db.EmployeSessionKPI.Remove(m);
 
                     // 2. Remove Weights
                     var weights = db.SessionKPIWeight.Where(w => w.KPIID == kpiid && w.SessionID == sid).ToList();
                     foreach (var w in weights) db.SessionKPIWeight.Remove(w);
 
-                    // 3. Remove SubKPIs (only those belonging to this KPI)
+                    // 3. Remove SubKPIs and KPI
                     var subs = db.SubKPI.Where(s => s.KPIID == kpiid).ToList();
                     foreach (var s in subs) db.SubKPI.Remove(s);
 
                     db.KPI.Remove(kpi);
                     db.SaveChanges();
 
-                    // 4. Global Weight Adjustment
+                    // 4. Global Weight Adjustment (Scaling back to 100%)
                     var bakiWeights = db.SessionKPIWeight.Where(w => w.SessionID == sid &&
                                       db.KPI.Any(k => k.id == w.KPIID && k.KPI_Employeetype == empTypeId)).ToList();
 
@@ -253,26 +279,23 @@ namespace FYP.Controllers.HOD
                             }
                         }
                     }
-
                     scope.Complete();
-                    return Ok(new { Message = "Deleted Successfully" });
+                    return Ok("KPI and all associated mappings deleted.");
                 }
             }
-            catch (Exception ex)
-            {
-                // This will help you see the EXACT C# error in your React Native console
-                return BadRequest(ex.InnerException?.Message ?? ex.Message);
-            }
+            catch (Exception ex) { return InternalServerError(ex); }
         }
+
         // 5. EDIT MAIN KPI NAME
         [HttpPut]
         [Route("edit-kpi-name/{id}")]
-        public IHttpActionResult EditKpiName(int id, [FromBody] string newName)
+        public IHttpActionResult EditKpiName(int id, [FromBody] EditNameDto dto)
         {
-            if (string.IsNullOrEmpty(newName)) return BadRequest("Name required.");
+            if (dto == null || string.IsNullOrEmpty(dto.Name))
+                return BadRequest("Name required.");
             var kpi = db.KPI.Find(id);
             if (kpi == null) return NotFound();
-            kpi.name = newName;
+            kpi.name = dto.Name;
             db.SaveChanges();
             return Ok("KPI updated.");
         }
@@ -280,12 +303,13 @@ namespace FYP.Controllers.HOD
         // 6. EDIT SUB-KPI NAME
         [HttpPut]
         [Route("edit-subkpi-name/{id}")]
-        public IHttpActionResult EditSubKpiName(int id, [FromBody] string newName)
+        public IHttpActionResult EditSubKpiName(int id, [FromBody] EditNameDto dto)
         {
-            if (string.IsNullOrEmpty(newName)) return BadRequest("Name required.");
+            if (dto == null || string.IsNullOrEmpty(dto.Name))
+                return BadRequest("Name required.");
             var sub = db.SubKPI.Find(id);
             if (sub == null) return NotFound();
-            sub.name = newName;
+            sub.name = dto.Name;
             db.SaveChanges();
             return Ok("Sub-KPI updated.");
         }
@@ -344,6 +368,113 @@ namespace FYP.Controllers.HOD
 
         [HttpGet][Route("sessions")] public IHttpActionResult GetSessions() => Ok(db.Session.Select(s => new { s.id, s.name }).ToList());
         [HttpGet][Route("emptypes")] public IHttpActionResult GetEmpTypes() => Ok(db.EmployeeType.Select(e => new { e.id, e.type }).ToList());
+
+        /////////////////////////////////
+        ///edit kpi 
+        // 7A. EDIT KPI WEIGHT (Auto-adjusts all other KPIs to maintain 100%)
+        // ── 7A. EDIT KPI WEIGHT ───────────────────────────────────────────────────────
+        [HttpPut]
+        [Route("edit-kpi-weight/{sessionId}/{kpiId}")]
+        public IHttpActionResult EditKpiWeight(int sessionId, int kpiId, [FromBody] EditWeightDto dto)
+        {
+            if (dto == null || dto.Weight <= 0 || dto.Weight >= 100)
+                return BadRequest("Weight must be between 1 and 99.");
+
+            try
+            {
+                using (var scope = new TransactionScope())
+                {
+                    var kpi = db.KPI.Find(kpiId);
+                    if (kpi == null) return NotFound();
+                    int empTypeId = kpi.KPI_Employeetype ?? 0;
+
+                    var currentSubWeights = db.SessionKPIWeight
+                        .Where(w => w.SessionID == sessionId && w.KPIID == kpiId).ToList();
+                    if (!currentSubWeights.Any())
+                        return BadRequest("No weights found for this KPI in this session.");
+
+                    int oldKpiTotal = currentSubWeights.Sum(w => w.Weight ?? 0);
+
+                    if (oldKpiTotal > 0)
+                    {
+                        decimal scaleFactor = (decimal)dto.Weight / oldKpiTotal;
+                        foreach (var w in currentSubWeights)
+                            w.Weight = (int)Math.Round((w.Weight ?? 0) * scaleFactor, MidpointRounding.AwayFromZero);
+                        db.SaveChanges();
+
+                        int newSubSum = currentSubWeights.Sum(w => w.Weight ?? 0);
+                        if (newSubSum != dto.Weight)
+                        {
+                            currentSubWeights.First().Weight += (dto.Weight - newSubSum);
+                            db.SaveChanges();
+                        }
+                    }
+
+                    AdjustGlobalWeights(sessionId, empTypeId, kpiId, dto.Weight);
+
+                    scope.Complete();
+                    return Ok(new { Message = "KPI weight updated and all others auto-adjusted.", NewWeight = dto.Weight });
+                }
+            }
+            catch (Exception ex) { return InternalServerError(new Exception("Error: " + ex.Message)); }
+        }
+
+        // ── 7B. EDIT SUB-KPI WEIGHT ───────────────────────────────────────────────────
+        [HttpPut]
+        [Route("edit-subkpi-weight/{sessionId}/{subKpiId}")]
+        public IHttpActionResult EditSubKpiWeight(int sessionId, int subKpiId, [FromBody] EditWeightDto dto)
+        {
+            if (dto == null || dto.Weight <= 0)
+                return BadRequest("Weight must be greater than 0.");
+
+            try
+            {
+                using (var scope = new TransactionScope())
+                {
+                    var targetWeight = db.SessionKPIWeight
+                        .FirstOrDefault(w => w.SessionID == sessionId && w.SubKPIID == subKpiId);
+                    if (targetWeight == null) return NotFound();
+
+                    int kpiId = (int)targetWeight.KPIID;
+
+                    var allSubWeights = db.SessionKPIWeight
+                        .Where(w => w.SessionID == sessionId && w.KPIID == kpiId).ToList();
+
+                    int kpiTotal = allSubWeights.Sum(w => w.Weight ?? 0);
+
+                    if (dto.Weight >= kpiTotal)
+                        return BadRequest($"Sub-KPI weight must be less than KPI total ({kpiTotal}).");
+
+                    var siblingWeights = allSubWeights
+                        .Where(w => w.SubKPIID != subKpiId).ToList();
+
+                    int oldSiblingTotal = siblingWeights.Sum(w => w.Weight ?? 0);
+                    int targetSiblingTotal = kpiTotal - dto.Weight;
+
+                    targetWeight.Weight = dto.Weight;
+
+                    if (oldSiblingTotal > 0 && siblingWeights.Any())
+                    {
+                        decimal scaleFactor = (decimal)targetSiblingTotal / oldSiblingTotal;
+                        foreach (var w in siblingWeights)
+                            w.Weight = (int)Math.Round((w.Weight ?? 0) * scaleFactor, MidpointRounding.AwayFromZero);
+                        db.SaveChanges();
+
+                        int newTotal = allSubWeights.Sum(w => w.Weight ?? 0);
+                        if (newTotal != kpiTotal)
+                        {
+                            siblingWeights.First().Weight += (kpiTotal - newTotal);
+                            db.SaveChanges();
+                        }
+                    }
+
+                    db.SaveChanges();
+                    scope.Complete();
+                    return Ok(new { Message = "Sub-KPI weight updated and siblings auto-adjusted.", KpiTotal = kpiTotal });
+                }
+            }
+            catch (Exception ex) { return InternalServerError(new Exception("Error: " + ex.Message)); }
+        }
     }
 }
 
