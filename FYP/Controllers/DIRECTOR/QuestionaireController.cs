@@ -34,15 +34,17 @@ namespace FYP.Controllers.DIRECTOR
             db.SaveChanges(); // 🔥 ID generated here
 
             // 2️⃣ Insert Questions
-            foreach (var q in model.Questions)
+            foreach (var qObj in model.Questions) // model.Questions ab object list hai
             {
-                var question = new Questions
+                if (!string.IsNullOrWhiteSpace(qObj.QuestionText))
                 {
-                    QuestionareID = questionnaire.id,
-                    QuestionText = q
-                };
-
-                db.Questions.Add(question);
+                    db.Questions.Add(new Questions
+                    {
+                        QuestionareID = questionnaire.id,
+                        QuestionText = qObj.QuestionText,
+                        isCritical = qObj.isCritical // <--- Ye naya column add karein
+                    });
+                }
             }
 
             db.SaveChanges();
@@ -137,7 +139,8 @@ namespace FYP.Controllers.DIRECTOR
                     var newQuestion = new Questions
                     {
                         QuestionareID = model.QuestionnaireId,
-                        QuestionText = q.QuestionText
+                        QuestionText = q.QuestionText,
+                        isCritical=    q.isCritical
                     };
                     db.Questions.Add(newQuestion);
                 }
@@ -148,6 +151,7 @@ namespace FYP.Controllers.DIRECTOR
                     if (existing != null)
                     {
                         existing.QuestionText = q.QuestionText;
+                        existing.isCritical = q.isCritical;
                     }
                 }
             }
@@ -176,7 +180,9 @@ namespace FYP.Controllers.DIRECTOR
                     questions = q.Questions.Select(qq => new
                     {
                         id = qq.QuestionID,
-                        questionText = qq.QuestionText
+                        questionText = qq.QuestionText,
+                        isCritical = qq.isCritical // <--- Ye naya column add karein
+
                     }).ToList()
                 })
                 .FirstOrDefault();

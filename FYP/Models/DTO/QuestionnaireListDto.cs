@@ -11,5 +11,7 @@ namespace FYP.Models.DTO
         public string Type { get; set; }
         public string Flag { get; set; }
         public int QuestionCount { get; set; }
+
+        public int CriticalCount { get; set; }
     }
 }
