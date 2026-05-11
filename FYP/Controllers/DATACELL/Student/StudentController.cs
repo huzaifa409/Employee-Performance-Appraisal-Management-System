@@ -79,8 +79,7 @@ namespace FYP.Controllers
                                 id = userId,
                                 password = "default123",       // Can be customized
                                 role = "Student",
-                                profileImagePath = null,
-                                isActive = 1
+                              isActive = 1
                             };
                             db.Users.Add(newUser);
                         }

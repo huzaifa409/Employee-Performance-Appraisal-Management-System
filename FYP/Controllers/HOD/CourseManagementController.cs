@@ -16,6 +16,29 @@ namespace FYP.Controllers.HOD
 
         FYPEntities db = new FYPEntities();
 
+        //[HttpGet]
+        //[Route("EnrollmentCourses/{sessionId}")]
+        //public IHttpActionResult GetEnrollmentCourses(int sessionId)
+        //{
+        //    var data = (from e in db.Enrollment
+        //                join t in db.Teacher
+        //                    on e.teacherID equals t.userID
+        //                join c in db.Course
+        //                    on e.courseCode equals c.code
+        //                where e.sessionID == sessionId
+        //                select new
+        //                {
+        //                    id = e.id,
+        //                    teacher = t.name,
+        //                    teacherID = t.userID,
+        //                    course = c.title,
+        //                    code = e.courseCode
+        //                }).ToList();
+
+        //    return Ok(data);
+        //}
+
+
         [HttpGet]
         [Route("EnrollmentCourses/{sessionId}")]
         public IHttpActionResult GetEnrollmentCourses(int sessionId)
@@ -26,13 +49,20 @@ namespace FYP.Controllers.HOD
                         join c in db.Course
                             on e.courseCode equals c.code
                         where e.sessionID == sessionId
+                        group new { e, t, c } by new
+                        {
+                            t.userID,
+                            t.name,
+                            c.code,
+                            c.title
+                        } into g
                         select new
                         {
-                            id = e.id,
-                            teacher = t.name,
-                            teacherID = t.userID,
-                            course = c.title,
-                            code = e.courseCode
+                            id = g.FirstOrDefault().e.id,
+                            teacher = g.Key.name,
+                            teacherID = g.Key.userID,
+                            course = g.Key.title,
+                            code = g.Key.code
                         }).ToList();
 
             return Ok(data);
@@ -43,9 +73,10 @@ namespace FYP.Controllers.HOD
 
 
 
+
         /// //////// ///// ////////  ////              COURSE MANAGEMENT 
         /// 
-     
+
 
         // 2. POST: Evaluate Submission (Handles Paper and Folder)
         [HttpPost]

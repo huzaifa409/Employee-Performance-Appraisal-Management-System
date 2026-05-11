@@ -219,12 +219,12 @@ namespace FYP.Controllers.Student
 
         private void SendEmail(string body)
         {
-            var fromAddress = new MailAddress("biit.epas.system@gmail.com");
+            var fromAddress = new MailAddress("onlyforwork015@gmail.com");
             var activeEmail = db.Email
                            .FirstOrDefault(x => x.isActive == true);
             var toAddress = new MailAddress(activeEmail.mail);
 
-            const string fromPassword = "viylzrgalznlcnys";
+            const string fromPassword = "iiqoyebexdzwsdop";
 
             var smtp = new SmtpClient
             {

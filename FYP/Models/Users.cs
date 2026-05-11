@@ -25,7 +25,6 @@ namespace FYP.Models
         public string id { get; set; }
         public string password { get; set; }
         public string role { get; set; }
-        public string profileImagePath { get; set; }
         public Nullable<int> isActive { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
