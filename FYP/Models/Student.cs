@@ -24,6 +24,7 @@ namespace FYP.Models
         public string userID { get; set; }
         public string name { get; set; }
         public Nullable<int> admissionSessionID { get; set; }
+        public Nullable<decimal> CGPA { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Enrollment> Enrollment { get; set; }
