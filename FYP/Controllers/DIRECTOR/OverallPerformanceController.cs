@@ -17,6 +17,499 @@ namespace FYP.Controllers.DIRECTOR
        FYPEntities db = new FYPEntities();
 
 
+        ///// /// /// COmparison API ////
+        ///
+
+
+        [HttpGet]
+        [Route("GetTeacherComparisonAnalytics/{teacherId}/{sessionId}")]
+        public IHttpActionResult GetTeacherComparisonAnalytics(
+         string teacherId,
+            int sessionId,
+            int? kpiId = null)
+        {
+            try
+            {
+                // =========================
+                // VALIDATE SESSION
+                // =========================
+
+                var currentSession = db.Session
+                    .FirstOrDefault(s => s.id == sessionId);
+
+                if (currentSession == null)
+                    return BadRequest("Invalid Session ID.");
+
+                // =========================
+                // VALIDATE TEACHER
+                // =========================
+
+                var teacherData = db.Teacher
+                    .FirstOrDefault(t => t.userID == teacherId);
+
+                if (teacherData == null)
+                    return BadRequest("Teacher not found.");
+
+                // =========================
+                // CHECK SOCIETY MEMBER
+                // =========================
+
+                var isSocietyMember = db.SocietyAssignments
+                    .Any(sa =>
+                        sa.TeacherId == teacherId &&
+                        sa.SessionId == sessionId);
+
+                // =========================
+                // GET ACTIVE KPIs
+                // =========================
+
+                var activeKPIs = db.EmployeSessionKPI
+                    .Where(esk =>
+                        esk.SessionID == sessionId &&
+                        (kpiId == null || esk.KPIID == kpiId))
+                    .Select(esk => new
+                    {
+                        esk.id,
+                        esk.KPIID,
+                        esk.SubKPIID,
+
+                        KPIName = db.KPI
+                            .Where(k => k.id == esk.KPIID)
+                            .Select(k => k.name)
+                            .FirstOrDefault(),
+
+                        SubKPIName = db.SubKPI
+                            .Where(sk => sk.id == esk.SubKPIID)
+                            .Select(sk => sk.name)
+                            .FirstOrDefault()
+                    })
+                    .ToList();
+
+                if (!activeKPIs.Any())
+                {
+                    return Ok(new
+                    {
+                        Status = "Empty",
+                        Message = "No KPIs configured for this session."
+                    });
+                }
+
+                // =========================
+                // TOTAL CONFIGURED WEIGHT
+                // =========================
+
+                double totalConfiguredWeight = 0;
+
+                foreach (var item in activeKPIs)
+                {
+                    var weight = db.SessionKPIWeight
+                        .FirstOrDefault(w =>
+                            w.SessionID == sessionId &&
+                            w.KPIID == item.KPIID &&
+                            w.SubKPIID == item.SubKPIID);
+
+                    totalConfiguredWeight += weight?.Weight ?? 0;
+                }
+
+                // =========================
+                // REMOVE INVALID KPIs
+                // =========================
+
+                activeKPIs = activeKPIs
+                    .Where(item =>
+                    {
+                        string subName =
+                            (item.SubKPIName ?? "")
+                            .ToLower();
+
+                        // Remove society KPI if not member
+                        if (subName.Contains("society") &&
+                            !isSocietyMember)
+                        {
+                            return false;
+                        }
+
+                        return true;
+                    })
+                    .ToList();
+
+                // =========================
+                // ACTIVE WEIGHT
+                // =========================
+
+                double activeWeight = 0;
+
+                foreach (var item in activeKPIs)
+                {
+                    var weight = db.SessionKPIWeight
+                        .FirstOrDefault(w =>
+                            w.SessionID == sessionId &&
+                            w.KPIID == item.KPIID &&
+                            w.SubKPIID == item.SubKPIID);
+
+                    activeWeight += weight?.Weight ?? 0;
+                }
+
+                // =========================
+                // SCALE FACTOR
+                // =========================
+
+                double scaleFactor =
+                    activeWeight > 0
+                    ? totalConfiguredWeight / activeWeight
+                    : 1.0;
+
+                // =========================
+                // STUDENT AVERAGE
+                // =========================
+
+                var studentAvg = db.StudentEvaluation
+                    .Where(se =>
+                        se.Enrollment.teacherID == teacherId &&
+                        se.Enrollment.sessionID == sessionId)
+                    .Select(x => (double?)x.score)
+                    .DefaultIfEmpty()
+                    .Average() ?? 0;
+
+                // =========================
+                // PEER AVERAGE
+                // =========================
+
+                var peerAvg = db.PeerEvaluation
+                    .Where(pe =>
+                        pe.evaluateeID == teacherId &&
+                        pe.PeerEvaluator.sessionID == sessionId)
+                    .Select(x => (double?)x.score)
+                    .DefaultIfEmpty()
+                    .Average() ?? 0;
+
+                // =========================
+                // SOCIETY AVERAGE
+                // =========================
+
+                var societyAvg = db.SocietyEvaluation
+                    .Where(se =>
+                        se.EvaluateeId == teacherId &&
+                        se.SessionId == sessionId)
+                    .Select(x => (double?)x.Score)
+                    .DefaultIfEmpty()
+                    .Average() ?? 0;
+
+                // =========================
+                // CHR DATA
+                // =========================
+
+                var chrRawData = db.CHR
+                    .Where(c =>
+                        c.TeacherID == teacherId &&
+                        c.sessionID == sessionId)
+                    .Select(x => new
+                    {
+                        LateIn = x.LateIn ?? 0,
+                        LeftEarly = x.LeftEarly ?? 0
+                    })
+                    .ToList();
+
+                // =========================
+                // CHR SCORE
+                // =========================
+
+                var chrAvg = chrRawData.Any()
+                    ? chrRawData
+                        .Select(x =>
+                        {
+                            int total =
+                                x.LateIn + x.LeftEarly;
+
+                            if (total >= 10) return 0.0;
+                            if (total >= 6) return 3.0;
+                            if (total >= 1) return 4.0;
+
+                            return 5.0;
+                        })
+                        .Average()
+                    : 0.0;
+
+                // =========================
+                // CONFIDENTIAL SCORES
+                // =========================
+
+                var confScores = db.KPIScore
+                    .Where(ks =>
+                        ks.empID == teacherId &&
+                        ks.EmployeSessionKPI.SessionID == sessionId)
+                    .ToList();
+
+                // =========================
+                // GROUP KPI
+                // =========================
+
+                var groupedKPIs = activeKPIs
+                    .GroupBy(k => new
+                    {
+                        k.KPIID,
+                        k.KPIName
+                    });
+
+                var finalBreakdown =
+                    new List<object>();
+
+                double totalAchieved = 0;
+                double totalWeight = 0;
+
+                // =========================
+                // LOOP KPI GROUPS
+                // =========================
+
+                foreach (var kpiGroup in groupedKPIs)
+                {
+                    var subDetails =
+                        new List<object>();
+
+                    double kpiAchieved = 0;
+                    double kpiWeight = 0;
+
+                    // =========================
+                    // LOOP SUB KPIs
+                    // =========================
+
+                    foreach (var item in kpiGroup)
+                    {
+                        var weightEntry =
+                            db.SessionKPIWeight
+                            .FirstOrDefault(w =>
+                                w.SessionID == sessionId &&
+                                w.KPIID == item.KPIID &&
+                                w.SubKPIID == item.SubKPIID);
+
+                        double weight =
+                            weightEntry?.Weight ?? 0;
+
+                        // SCALE WEIGHT
+                        double scaledWeight =
+                            Math.Round(weight * scaleFactor, 2);
+
+                        string subName =
+                            (item.SubKPIName ?? "")
+                            .ToLower();
+
+                        double rawScore = 0;
+                        double maxScale = 4.0;
+
+                        // =========================
+                        // DETERMINE SCORE
+                        // =========================
+
+                        if (subName.Contains("student"))
+                        {
+                            rawScore = studentAvg;
+                        }
+                        else if (subName.Contains("peer"))
+                        {
+                            rawScore = peerAvg;
+                        }
+                        else if (subName.Contains("society"))
+                        {
+                            rawScore =
+                                isSocietyMember
+                                ? societyAvg
+                                : 0;
+                        }
+                        else if (subName.Contains("confidential"))
+                        {
+                            rawScore = 0;
+                        }
+                        else if (
+                            subName.Contains("chr") ||
+                            subName.Contains("class held report"))
+                        {
+                            rawScore = chrAvg;
+                            maxScale = 5.0;
+                        }
+                        else
+                        {
+                            var specificScore =
+                                confScores
+                                .Where(cs =>
+                                    cs.empKPIID == item.id)
+                                .Average(cs =>
+                                    (double?)cs.score);
+
+                            rawScore =
+                                specificScore ?? 0;
+
+                            maxScale = 5.0;
+                        }
+
+                        // =========================
+                        // ACHIEVED SCORE
+                        // =========================
+
+                        double achieved =
+                            Math.Round(
+                                (rawScore / maxScale)
+                                * scaledWeight,
+                                2);
+
+                        // =========================
+                        // SUB KPI PERCENTAGE
+                        // =========================
+
+                        double subPercentage =
+                            scaledWeight > 0
+                            ? Math.Round(
+                                (achieved / scaledWeight)
+                                * 100,
+                                2)
+                            : 0;
+
+                        subDetails.Add(new
+                        {
+                            SubKPIId = item.SubKPIID,
+
+                            SubName = item.SubKPIName,
+
+                            Weight = scaledWeight,
+
+                            Achieved = achieved,
+
+                            Percentage = subPercentage,
+
+                            RawScore = Math.Round(rawScore, 2),
+
+                            MaxScale = maxScale,
+
+                            IsSociety =
+                                subName.Contains("society")
+                                && isSocietyMember,
+
+                            IsCHR =
+                                subName.Contains("chr")
+                                || subName.Contains("class held report")
+                        });
+
+                        kpiAchieved += achieved;
+                        kpiWeight += scaledWeight;
+                    }
+
+                    // =========================
+                    // KPI PERCENTAGE
+                    // =========================
+
+                    double kpiPercentage =
+                        kpiWeight > 0
+                        ? Math.Round(
+                            (kpiAchieved / kpiWeight)
+                            * 100,
+                            2)
+                        : 0;
+
+                    finalBreakdown.Add(new
+                    {
+                        KPIId = kpiGroup.Key.KPIID,
+
+                        KPIName = kpiGroup.Key.KPIName,
+
+                        KPIWeight =
+                            Math.Round(kpiWeight, 2),
+
+                        KPIAchieved =
+                            Math.Round(kpiAchieved, 2),
+
+                        KPIPercentage =
+                            kpiPercentage,
+
+                        SubKPIs = subDetails
+                    });
+
+                    totalAchieved += kpiAchieved;
+                    totalWeight += kpiWeight;
+                }
+
+                // =========================
+                // OVERALL PERCENTAGE
+                // =========================
+
+                double overallPercentage =
+                    totalWeight > 0
+                    ? Math.Round(
+                        (totalAchieved / totalWeight)
+                        * 100,
+                        2)
+                    : 0;
+
+                // =========================
+                // TOP KPI
+                // =========================
+
+                var topKPI = finalBreakdown
+                    .OrderByDescending(x =>
+                        ((dynamic)x).KPIPercentage)
+                    .FirstOrDefault();
+
+                // =========================
+                // LOWEST KPI
+                // =========================
+
+                var lowestKPI = finalBreakdown
+                    .OrderBy(x =>
+                        ((dynamic)x).KPIPercentage)
+                    .FirstOrDefault();
+
+                // =========================
+                // FINAL RESPONSE
+                // =========================
+
+                return Ok(new
+                {
+                    Status = "Success",
+
+                    TeacherId = teacherId,
+
+                    TeacherName = teacherData.name,
+
+                    Department = teacherData.department,
+
+                    SessionId = currentSession.id,
+
+                    SessionName = currentSession.name,
+
+                    IsSocietyMember = isSocietyMember,
+
+                    OverallPercentage =
+                        overallPercentage,
+
+                    TotalWeight =
+                        Math.Round(totalWeight, 2),
+
+                    TotalAchieved =
+                        Math.Round(totalAchieved, 2),
+
+                    StudentAverage =
+                        Math.Round(studentAvg, 2),
+
+                    PeerAverage =
+                        Math.Round(peerAvg, 2),
+
+                    SocietyAverage =
+                        Math.Round(societyAvg, 2),
+
+                    ChrAverage =
+                        Math.Round(chrAvg, 2),
+
+                    TopPerformingKPI = topKPI,
+
+                    LowestPerformingKPI = lowestKPI,
+
+                    KPIBreakdown = finalBreakdown
+                });
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+        }
+
 
 
         //[HttpGet]

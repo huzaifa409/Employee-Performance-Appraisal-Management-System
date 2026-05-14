@@ -75,6 +75,7 @@
         <AssociationConnector Association="FYPModel.FK__CHR__CourseCode__54CB950F" />
         <AssociationConnector Association="FYPModel.FK__CHR__TeacherID__55BFB948" />
         <AssociationConnector Association="FYPModel.FK_CHR_Session" />
+        <AssociationConnector Association="FYPModel.FK__KPIScore__enroll__0C1BC9F9" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

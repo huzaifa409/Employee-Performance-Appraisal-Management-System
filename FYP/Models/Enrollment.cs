@@ -18,6 +18,7 @@ namespace FYP.Models
         public Enrollment()
         {
             this.StudentEvaluation = new HashSet<StudentEvaluation>();
+            this.KPIScore = new HashSet<KPIScore>();
         }
     
         public int id { get; set; }
@@ -34,5 +35,7 @@ namespace FYP.Models
         public virtual Teacher Teacher { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<StudentEvaluation> StudentEvaluation { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<KPIScore> KPIScore { get; set; }
     }
 }
