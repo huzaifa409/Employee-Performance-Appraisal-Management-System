@@ -97,8 +97,11 @@ namespace FYP.Controllers.HOD
                         int folderScore = eval.FolderStatus.ToLower().Contains("on-time") ? 5 : 2;
 
                         // Remarks Formatting
-                        string pRemarks = $"Paper: {eval.PaperStatus} | Note: {eval.Remarks}";
-                        string fRemarks = $"Folder: {eval.FolderStatus} | Note: {eval.Remarks}";
+                        //string pRemarks = $"Paper: {eval.PaperStatus} | Note: {eval.Remarks}";
+                        //string fRemarks = $"Folder: {eval.FolderStatus} | Note: {eval.Remarks}";
+
+                        string pRemarks = $"Paper: {eval.PaperStatus} |  {eval.Remarks}";
+                        string fRemarks = $"Folder: {eval.FolderStatus} | {eval.Remarks}";
 
                         // Call Helper for both KPIs
                         UpsertScore(dto.TeacherID, dto.SessionID, "Paper Submission", paperScore, dto.HODID, eval.CourseCode, pRemarks);
@@ -179,8 +182,10 @@ namespace FYP.Controllers.HOD
                                        ObtainedScore = s.score,
                                        Status = s.score == 5 ? "On Time" : "Late",
                                        // Default Remark + Database se manual Remark dono ko jor diya
-                                       Remarks = (s.score == 5 ? "Excellent! Submitted on time." : "Delayed submission recorded.")
-                                                 + " | HOD Note: " + (s.remarks ?? "No additional notes.")
+                                       //Remarks = (s.score == 5 ? "Excellent! Submitted on time." : "Delayed submission recorded.")
+                                       //          + " | HOD Note: " + (s.remarks ?? "No additional notes.")
+
+                                       Remarks=s.remarks
                                    }).ToList();
 
                 var courseDetails = (from e in db.Enrollment

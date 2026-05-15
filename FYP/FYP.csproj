@@ -168,6 +168,7 @@
     <Compile Include="Controllers\HOD\PeerEvaluatorsController.cs" />
     <Compile Include="Controllers\HOD\SocietyEvaluationController.cs" />
     <Compile Include="Controllers\LOGIN\UsersController.cs" />
+    <Compile Include="Controllers\Practice\PracticeController.cs" />
     <Compile Include="Controllers\Student\StudentDashboardController.cs" />
     <Compile Include="Controllers\Teacher\CHRController.cs" />
     <Compile Include="Controllers\Teacher\TeacherDashboardController.cs" />
