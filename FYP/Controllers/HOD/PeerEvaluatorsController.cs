@@ -14,22 +14,22 @@ namespace FYP.Controllers.HOD
     {
         FYPEntities db = new FYPEntities();
 
-        
-            [HttpGet]
-            [Route("Teachers")]
-            public IHttpActionResult GetTeachers()
-            {
-                var teachers = db.Teacher
-                    .Select(t => new
-                    {
-                        t.userID,
-                        t.name,
-                        t.department
-                    })
-                    .ToList();
 
-                return Ok(teachers);
-            }
+        [HttpGet]
+        [Route("Teachers")]
+        public IHttpActionResult GetTeachers()
+        {
+            var teachers = db.Teacher
+                .Select(t => new
+                {
+                    t.userID,
+                    t.name,
+                    t.department
+                })
+                .ToList();
+
+            return Ok(teachers);
+        }
 
         [HttpGet]
         [Route("GetNonPermenentTeachers")]
@@ -57,21 +57,21 @@ namespace FYP.Controllers.HOD
 
 
         [HttpGet]
-            [Route("Sessions")]
-            public IHttpActionResult GetSessions()
-            {
-                var sessions = db.Session
-                    .Select(s => new
-                    {
-                        s.id,
-                        s.name
-                    })
-                    .ToList();
+        [Route("Sessions")]
+        public IHttpActionResult GetSessions()
+        {
+            var sessions = db.Session
+                .Select(s => new
+                {
+                    s.id,
+                    s.name
+                })
+                .ToList();
 
-                return Ok(sessions);
-            }
+            return Ok(sessions);
+        }
 
-        
+
         [HttpPost]
         [Route("Add")]
         public IHttpActionResult AddPeerEvaluators(AddPeerEvaluatorDto model)
@@ -115,12 +115,12 @@ namespace FYP.Controllers.HOD
                               where pe.sessionID == sessionId
                               select new
                               {
-                                  userID = t.userID,  
+                                  userID = t.userID,
                                   name = t.name,
                                   department = t.department
                               }).ToList();
 
-            return Ok(evaluators); 
+            return Ok(evaluators);
         }
 
 
@@ -220,9 +220,15 @@ namespace FYP.Controllers.HOD
                 return InternalServerError(ex);
             }
         }
+
+
+
+
+
+       
+
+
     }
-
-
 
 
 }
